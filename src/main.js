@@ -1,7 +1,13 @@
 import './style.css';
-import { performAttack, applyContactDamage } from './combat.js';
+import { performAttack, applyContactDamage, performSpinAttack } from './combat.js';
 import { allEnemiesDefeated, spawnWave, updateEnemyVisuals } from './enemies.js';
 import { createInput } from './input.js';
+import {
+  setPantsOption,
+  setTopOption,
+  startGameWithOutfit,
+  syncPlayerOutfit
+} from './outfit.js';
 import { createPlayer, updatePlayer } from './player.js';
 import {
   closeForge,
@@ -16,6 +22,7 @@ import { renderHud } from './ui.js';
 
 const state = createGameState();
 const appRoot = document.querySelector('#app');
+const hud = document.querySelector('#hud');
 const { scene, camera, renderer } = createSceneApp(state);
 const player = createPlayer(state);
 const input = createInput();
@@ -24,6 +31,43 @@ appRoot.append(renderer.domElement);
 scene.add(player);
 spawnWave(scene, state, 1);
 renderHud(state);
+hud.addEventListener('pointerdown', (event) => {
+  const button = event.target.closest('button');
+
+  if (!button) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (button.dataset.topIndex !== undefined) {
+    setTopOption(state, Number(button.dataset.topIndex));
+    syncPlayerOutfit(state);
+    renderHud(state);
+    return;
+  }
+
+  if (button.dataset.pantsIndex !== undefined) {
+    setPantsOption(state, Number(button.dataset.pantsIndex));
+    syncPlayerOutfit(state);
+    renderHud(state);
+    return;
+  }
+
+  if (button.dataset.action === 'start-game') {
+    startGameWithOutfit(state);
+    renderHud(state);
+    return;
+  }
+
+  if (button.dataset.action === 'spin-attack' && state.mode === 'playing') {
+    if (!performSpinAttack(state, scene) && state.timers.spinCooldown > 0) {
+      setMessage(state, `Spin attack is recharging for ${state.timers.spinCooldown.toFixed(1)} more seconds.`, 2);
+    }
+
+    renderHud(state);
+  }
+});
 
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -40,6 +84,8 @@ renderer.setAnimationLoop((time) => {
 
   state.timers.attackCooldown = Math.max(state.timers.attackCooldown - delta, 0);
   state.timers.attackAnimation = Math.max(state.timers.attackAnimation - delta, 0);
+  state.timers.spinCooldown = Math.max(state.timers.spinCooldown - delta, 0);
+  state.timers.spinAnimation = Math.max(state.timers.spinAnimation - delta, 0);
 
   if (state.ui.messageTimer > 0) {
     state.ui.messageTimer = Math.max(state.ui.messageTimer - delta, 0);
@@ -75,7 +121,7 @@ renderer.setAnimationLoop((time) => {
   }
 
   updatePickups(state, scene, delta, elapsedTime);
-  updateEnemyVisuals(state, elapsedTime);
+  updateEnemyVisuals(state, delta, elapsedTime);
 
   if (allEnemiesDefeated(state)) {
     spawnWave(scene, state, state.wave + 1);

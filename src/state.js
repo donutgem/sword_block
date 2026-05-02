@@ -1,18 +1,20 @@
 import * as THREE from 'three';
 
 const spawnPosition = new THREE.Vector3(0, 0, 10);
+const startingHealth = 50;
+const healthGrowthPerClearedWave = 5 / 4;
 
 export function createGameState() {
   return {
-    mode: 'playing',
+    mode: 'customize',
     wave: 1,
     arena: {
       halfSize: 18
     },
     player: {
       level: 1,
-      health: 100,
-      maxHealth: 100,
+      health: startingHealth,
+      maxHealth: startingHealth,
       baseDamage: 8,
       swordLevel: 1,
       position: spawnPosition.clone(),
@@ -24,7 +26,12 @@ export function createGameState() {
       object: null,
       swordPivot: null,
       swordMesh: null,
-      swordVisualLevel: 0
+      swordVisualLevel: 0,
+      outfit: {
+        topIndex: 0,
+        pantsIndex: 0
+      },
+      outfitMaterials: null
     },
     inventory: {
       blade: 0,
@@ -46,7 +53,9 @@ export function createGameState() {
     },
     timers: {
       attackCooldown: 0,
-      attackAnimation: 0
+      attackAnimation: 0,
+      spinCooldown: 0,
+      spinAnimation: 0
     },
     nextIds: {
       enemy: 1,
@@ -55,11 +64,15 @@ export function createGameState() {
     shardCycle: ['blade', 'guard', 'pommel'],
     shardCycleIndex: 0,
     ui: {
-      message: 'Press K to move, J/L to turn, and Space to thrust your sword forward.',
+      message: 'Choose your shirt and pants, then press Start Game.',
       messageTimer: 0,
       forgeOpen: false
     }
   };
+}
+
+export function getMaxHealthForClearedWaves(clearedWaves) {
+  return Math.round(startingHealth * healthGrowthPerClearedWave ** clearedWaves);
 }
 
 export function setMessage(state, text, duration = 3) {

@@ -6,6 +6,8 @@ import { setMessage } from './state.js';
 const attackForward = new THREE.Vector3();
 const toEnemy = new THREE.Vector3();
 const pushDirection = new THREE.Vector3();
+const spinAttackCooldown = 5;
+const spinAttackDuration = 0.35;
 
 export function performAttack(state, scene) {
   if (state.timers.attackCooldown > 0) {
@@ -18,8 +20,7 @@ export function performAttack(state, scene) {
   const forward = getForwardVector(state.player.rotationY, attackForward);
   const damage = state.player.baseDamage + getSwordBonus(state.player.swordLevel);
   const attackReach = 1.3 + getSwordBladeLength(state.player.swordLevel);
-  const defeatedIds = [];
-  let hitCount = 0;
+  const hitResult = createHitResult();
 
   for (const enemy of state.enemies) {
     toEnemy.subVectors(enemy.mesh.position, state.player.position);
@@ -36,37 +37,48 @@ export function performAttack(state, scene) {
       continue;
     }
 
-    enemy.health = Math.max(enemy.health - damage, 0);
-    hitCount += 1;
-
-    if (enemy.health === 0) {
-      defeatedIds.push(enemy.id);
-    }
+    applyDamageToEnemy(enemy, damage, hitResult);
   }
 
-  if (defeatedIds.length > 0) {
-    const remainingEnemies = [];
-
-    for (const enemy of state.enemies) {
-      if (!defeatedIds.includes(enemy.id)) {
-        remainingEnemies.push(enemy);
-        continue;
-      }
-
-      scene.remove(enemy.mesh);
-      handleEnemyDefeat(state, scene, enemy.mesh.position);
-    }
-
-    state.enemies = remainingEnemies;
-    return true;
-  }
-
-  if (hitCount > 0) {
+  if (finishHits(state, scene, hitResult)) {
     setMessage(state, `Sword hit for ${damage} damage.`, 2);
     return true;
   }
 
   setMessage(state, 'Thrust missed. Turn toward the block and move closer.', 2);
+  return false;
+}
+
+export function performSpinAttack(state, scene) {
+  if (state.timers.attackCooldown > 0 || state.timers.spinCooldown > 0) {
+    return false;
+  }
+
+  state.timers.attackCooldown = 0.9;
+  state.timers.spinCooldown = spinAttackCooldown;
+  state.timers.spinAnimation = spinAttackDuration;
+
+  const damage = Math.round((state.player.baseDamage + getSwordBonus(state.player.swordLevel)) * 0.9);
+  const attackReach = 1.7 + getSwordBladeLength(state.player.swordLevel) * 0.75;
+  const hitResult = createHitResult();
+
+  for (const enemy of state.enemies) {
+    toEnemy.subVectors(enemy.mesh.position, state.player.position);
+    const distance = Math.hypot(toEnemy.x, toEnemy.z);
+
+    if (distance > attackReach) {
+      continue;
+    }
+
+    applyDamageToEnemy(enemy, damage, hitResult);
+  }
+
+  if (finishHits(state, scene, hitResult)) {
+    setMessage(state, `Spin attack hit ${hitResult.hitCount} block${hitResult.hitCount === 1 ? '' : 's'}.`, 2);
+    return true;
+  }
+
+  setMessage(state, 'Spin attack missed. Let the blocks get closer first.', 2);
   return false;
 }
 
@@ -124,4 +136,42 @@ function clampPlayerToArena(state) {
     -limit,
     limit
   );
+}
+
+function createHitResult() {
+  return {
+    defeatedIds: [],
+    hitCount: 0
+  };
+}
+
+function applyDamageToEnemy(enemy, damage, hitResult) {
+  enemy.health = Math.max(enemy.health - damage, 0);
+  enemy.flashTimer = 0.18;
+  hitResult.hitCount += 1;
+
+  if (enemy.health === 0) {
+    hitResult.defeatedIds.push(enemy.id);
+  }
+}
+
+function finishHits(state, scene, hitResult) {
+  if (hitResult.defeatedIds.length > 0) {
+    const remainingEnemies = [];
+
+    for (const enemy of state.enemies) {
+      if (!hitResult.defeatedIds.includes(enemy.id)) {
+        remainingEnemies.push(enemy);
+        continue;
+      }
+
+      scene.remove(enemy.mesh);
+      handleEnemyDefeat(state, scene, enemy.mesh.position);
+    }
+
+    state.enemies = remainingEnemies;
+    return true;
+  }
+
+  return hitResult.hitCount > 0;
 }

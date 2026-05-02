@@ -7,8 +7,6 @@ export function getSwordBonus(level) {
 
 export function handleEnemyDefeat(state, scene, position) {
   state.player.level += 1;
-  state.player.maxHealth += 10;
-  state.player.health = state.player.maxHealth;
   state.player.baseDamage += 1;
 
   const shardType =

@@ -27,7 +27,7 @@ canvas {
   position: fixed;
   top: 16px;
   left: 16px;
-  width: min(320px, calc(100vw - 32px));
+  width: min(380px, calc(100vw - 32px));
   padding: 16px;
   border: 1px solid rgba(20, 33, 46, 0.12);
   border-radius: 18px;
@@ -54,6 +54,28 @@ canvas {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 14px;
+}
+
+.hud-health-bar {
+  margin-top: 8px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(71, 39, 24, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(20, 33, 46, 0.08);
+}
+
+.hud-health-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff7c67 0%, #ffb250 45%, #8ee07f 100%);
+  transition: width 120ms ease-out;
+}
+
+.hud-health-text {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .hud-card {
@@ -107,4 +129,67 @@ canvas {
   border: 1px solid rgba(20, 33, 46, 0.12);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.88);
+}
+
+.hud-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.hud-option-button,
+.hud-start-button,
+.hud-action-button {
+  border: 1px solid rgba(20, 33, 46, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #14212e;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hud-option-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.hud-option-button.is-selected {
+  border-color: #d07e30;
+  box-shadow: 0 0 0 2px rgba(208, 126, 48, 0.18);
+}
+
+.hud-option-swatch {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(20, 33, 46, 0.18);
+}
+
+.hud-start-button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f1bf64 0%, #ffd79a 100%);
+}
+
+.hud-action-row {
+  margin-top: 14px;
+}
+
+.hud-action-button {
+  width: 100%;
+  padding: 12px 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffb24d 0%, #ffe08f 100%);
+}
+
+.hud-action-button.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
 }
