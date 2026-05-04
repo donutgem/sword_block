@@ -8,7 +8,7 @@ import {
   startGameWithOutfit,
   syncPlayerOutfit
 } from './outfit.js';
-import { createPlayer, updatePlayer } from './player.js';
+import { createPlayer, syncSwordLevel, updatePlayer } from './player.js';
 import {
   closeForge,
   handleForgeInput,
@@ -121,6 +121,7 @@ renderer.setAnimationLoop((time) => {
   }
 
   updatePickups(state, scene, delta, elapsedTime);
+  syncSwordLevel(state);
   updateEnemyVisuals(state, delta, elapsedTime);
 
   if (allEnemiesDefeated(state)) {

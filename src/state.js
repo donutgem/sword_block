@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createCraftingBoard, createStarterSword } from './swordcraft.js';
 
 const spawnPosition = new THREE.Vector3(0, 0, 10);
 const startingHealth = 50;
@@ -17,6 +18,8 @@ export function createGameState() {
       maxHealth: startingHealth,
       baseDamage: 8,
       swordLevel: 1,
+      equippedSwordId: 'starter',
+      swordVersion: 0,
       position: spawnPosition.clone(),
       spawnPosition: spawnPosition.clone(),
       rotationY: 0,
@@ -26,7 +29,7 @@ export function createGameState() {
       object: null,
       swordPivot: null,
       swordMesh: null,
-      swordVisualLevel: 0,
+      swordVisualLevel: -1,
       outfit: {
         topIndex: 0,
         pantsIndex: 0
@@ -37,19 +40,15 @@ export function createGameState() {
       blade: 0,
       guard: 0,
       pommel: 0,
-      swordsByLevel: {
-        1: 1,
-        2: 0,
-        3: 0,
-        4: 0
-      }
+      swords: [createStarterSword()]
     },
     enemies: [],
     pickups: [],
     forge: {
       position: new THREE.Vector3(0, 0, -2),
       radius: 3,
-      object: null
+      object: null,
+      board: createCraftingBoard()
     },
     timers: {
       attackCooldown: 0,
@@ -59,7 +58,8 @@ export function createGameState() {
     },
     nextIds: {
       enemy: 1,
-      pickup: 1
+      pickup: 1,
+      sword: 1
     },
     shardCycle: ['blade', 'guard', 'pommel'],
     shardCycleIndex: 0,

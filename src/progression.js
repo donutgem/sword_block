@@ -1,8 +1,19 @@
 import * as THREE from 'three';
 import { setMessage } from './state.js';
+import {
+  canConfirmSword,
+  canMergeNewestSwords,
+  confirmShardSword,
+  getSwordDamageBonus,
+  mergeNewestSwords,
+  moveCraftCursor,
+  placeSelectedShard,
+  selectShardType,
+  undoPlacedShard
+} from './swordcraft.js';
 
-export function getSwordBonus(level) {
-  return 4 * 2 ** Math.max(level - 1, 0);
+export function getSwordBonus(state) {
+  return getSwordDamageBonus(state);
 }
 
 export function handleEnemyDefeat(state, scene, position) {
@@ -48,33 +59,20 @@ export function isNearForge(state) {
 }
 
 export function getForgeState(state) {
-  const highestCombinableLevel = getHighestCombinableLevel(state);
-
   return {
-    canCraft: canCraftSword(state),
-    canCombine: highestCombinableLevel > 0,
-    combineLevel: highestCombinableLevel
+    canCraft: canConfirmSword(state),
+    canCombine: canMergeNewestSwords(state)
   };
 }
 
 export function getForgePrompt(state) {
-  const action = getNextForgeAction(state);
-
-  if (!action) {
-    return 'Forge: walk into the glowing ring, then press E to open crafting.';
-  }
-
-  if (action.type === 'combine') {
-    return 'Forge nearby. Press E to open sword crafting.';
-  }
-
   return 'Forge nearby. Press E to open sword crafting.';
 }
 
 export function openForge(state) {
   state.mode = 'forge';
   state.ui.forgeOpen = true;
-  setMessage(state, 'Forge opened. Press 1 to craft, 2 to combine, or E to close.', 4);
+  setMessage(state, 'Forge opened. Arrange shards, press C to confirm, or M to merge swords.', 4);
 }
 
 export function closeForge(state) {
@@ -90,93 +88,58 @@ export function handleForgeInput(state, input) {
   }
 
   if (input.consumePress('Digit1')) {
-    if (tryCraftSword(state)) {
-      return;
-    }
-
-    setMessage(state, 'Need 1 blade, 1 guard, and 1 pommel to craft a sword.', 3);
+    selectShardType(state, 'blade');
     return;
   }
 
   if (input.consumePress('Digit2')) {
-    if (tryCombineSwords(state)) {
-      return;
-    }
-
-    setMessage(state, 'Need two swords of the same level to combine them.', 3);
-  }
-}
-
-export function tryCraftSword(state) {
-  if (!canCraftSword(state)) {
-    return false;
+    selectShardType(state, 'guard');
+    return;
   }
 
-  state.inventory.blade -= 1;
-  state.inventory.guard -= 1;
-  state.inventory.pommel -= 1;
-  state.inventory.swordsByLevel[1] += 1;
-  refreshEquippedSword(state);
-  setMessage(state, 'Crafted a new level 1 sword.', 3);
-  return true;
-}
-
-export function tryCombineSwords(state) {
-  const level = getHighestCombinableLevel(state);
-
-  if (!level) {
-    return false;
+  if (input.consumePress('Digit3')) {
+    selectShardType(state, 'pommel');
+    return;
   }
 
-  state.inventory.swordsByLevel[level] -= 2;
-  state.inventory.swordsByLevel[level + 1] += 1;
-  refreshEquippedSword(state);
-  setMessage(state, `Combined two level ${level} swords into level ${level + 1}.`, 4);
-  return true;
-}
-
-function canCraftSword(state) {
-  return (
-    state.inventory.blade >= 1 &&
-    state.inventory.guard >= 1 &&
-    state.inventory.pommel >= 1
-  );
-}
-
-function getNextForgeAction(state) {
-  const highestCombinableLevel = getHighestCombinableLevel(state);
-
-  if (highestCombinableLevel) {
-    return { type: 'combine', level: highestCombinableLevel };
+  if (input.consumePress('ArrowLeft') || input.consumePress('KeyA')) {
+    moveCraftCursor(state, -1, 0);
+    return;
   }
 
-  if (canCraftSword(state)) {
-    return { type: 'craft' };
+  if (input.consumePress('ArrowRight') || input.consumePress('KeyD')) {
+    moveCraftCursor(state, 1, 0);
+    return;
   }
 
-  return null;
-}
-
-function getHighestCombinableLevel(state) {
-  for (let level = 3; level >= 1; level -= 1) {
-    if (state.inventory.swordsByLevel[level] >= 2) {
-      return level;
-    }
+  if (input.consumePress('ArrowUp') || input.consumePress('KeyW')) {
+    moveCraftCursor(state, 0, -1);
+    return;
   }
 
-  return 0;
-}
-
-function refreshEquippedSword(state) {
-  for (let level = 4; level >= 1; level -= 1) {
-    if (state.inventory.swordsByLevel[level] > 0) {
-      state.player.swordLevel = level;
-      return;
-    }
+  if (input.consumePress('ArrowDown') || input.consumePress('KeyS')) {
+    moveCraftCursor(state, 0, 1);
+    return;
   }
 
-  state.player.swordLevel = 1;
-  state.inventory.swordsByLevel[1] = 1;
+  if (input.consumePress('Enter') || input.consumePress('Space')) {
+    placeSelectedShard(state);
+    return;
+  }
+
+  if (input.consumePress('Backspace')) {
+    undoPlacedShard(state);
+    return;
+  }
+
+  if (input.consumePress('KeyC')) {
+    confirmShardSword(state);
+    return;
+  }
+
+  if (input.consumePress('KeyM')) {
+    mergeNewestSwords(state);
+  }
 }
 
 function collectShard(state, shardType) {

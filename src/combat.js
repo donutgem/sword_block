@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { handleEnemyDefeat, getSwordBonus } from './progression.js';
-import { getForwardVector, getSwordBladeLength } from './player.js';
+import { getForwardVector } from './player.js';
 import { setMessage } from './state.js';
+import { getSwordBladeLength } from './swordcraft.js';
 
 const attackForward = new THREE.Vector3();
 const toEnemy = new THREE.Vector3();
@@ -18,22 +19,22 @@ export function performAttack(state, scene) {
   state.timers.attackAnimation = 0.18;
 
   const forward = getForwardVector(state.player.rotationY, attackForward);
-  const damage = state.player.baseDamage + getSwordBonus(state.player.swordLevel);
-  const attackReach = 1.3 + getSwordBladeLength(state.player.swordLevel);
+  const damage = state.player.baseDamage + getSwordBonus(state);
+  const attackReach = 1.3 + getSwordBladeLength(state);
   const hitResult = createHitResult();
 
   for (const enemy of state.enemies) {
     toEnemy.subVectors(enemy.mesh.position, state.player.position);
     const distance = Math.hypot(toEnemy.x, toEnemy.z);
 
-    if (distance > attackReach) {
+    if (distance > attackReach + enemy.radius) {
       continue;
     }
 
     toEnemy.y = 0;
     toEnemy.normalize();
 
-    if (forward.dot(toEnemy) < 0.4) {
+    if (forward.dot(toEnemy) < getFacingThreshold(state, enemy, distance)) {
       continue;
     }
 
@@ -58,15 +59,15 @@ export function performSpinAttack(state, scene) {
   state.timers.spinCooldown = spinAttackCooldown;
   state.timers.spinAnimation = spinAttackDuration;
 
-  const damage = Math.round((state.player.baseDamage + getSwordBonus(state.player.swordLevel)) * 0.9);
-  const attackReach = 1.7 + getSwordBladeLength(state.player.swordLevel) * 0.75;
+  const damage = Math.round((state.player.baseDamage + getSwordBonus(state)) * 0.9);
+  const attackReach = 1.7 + getSwordBladeLength(state) * 0.75;
   const hitResult = createHitResult();
 
   for (const enemy of state.enemies) {
     toEnemy.subVectors(enemy.mesh.position, state.player.position);
     const distance = Math.hypot(toEnemy.x, toEnemy.z);
 
-    if (distance > attackReach) {
+    if (distance > attackReach + enemy.radius) {
       continue;
     }
 
@@ -153,6 +154,16 @@ function applyDamageToEnemy(enemy, damage, hitResult) {
   if (enemy.health === 0) {
     hitResult.defeatedIds.push(enemy.id);
   }
+}
+
+function getFacingThreshold(state, enemy, distance) {
+  const closeEnoughToTouch = state.player.radius + enemy.radius + 0.45;
+
+  if (distance <= closeEnoughToTouch) {
+    return -0.1;
+  }
+
+  return 0.25;
 }
 
 function finishHits(state, scene, hitResult) {

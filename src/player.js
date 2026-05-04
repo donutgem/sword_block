@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { syncPlayerOutfit } from './outfit.js';
+import { getEquippedSword } from './swordcraft.js';
 
 const attackDuration = 0.18;
 const spinDuration = 0.35;
 const idleSwordAngle = -0.12;
 const thrustDistance = 0.95;
-const baseBladeLength = 1.45;
 const forwardVector = new THREE.Vector3();
 const baseSwordPivotPosition = new THREE.Vector3(0.66, 0.98, -0.08);
 
@@ -226,7 +226,7 @@ export function updatePlayer(delta, input, state) {
 }
 
 export function syncSwordLevel(state) {
-  if (state.player.swordVisualLevel === state.player.swordLevel) {
+  if (state.player.swordVisualLevel === state.player.swordVersion) {
     return;
   }
 
@@ -234,18 +234,14 @@ export function syncSwordLevel(state) {
     state.player.swordPivot.remove(state.player.swordMesh);
   }
 
-  const swordMesh = createSwordMesh(state.player.swordLevel);
+  const swordMesh = createSwordMesh(getEquippedSword(state));
   state.player.swordPivot.add(swordMesh);
   state.player.swordMesh = swordMesh;
-  state.player.swordVisualLevel = state.player.swordLevel;
+  state.player.swordVisualLevel = state.player.swordVersion;
 }
 
 export function getForwardVector(rotationY, target = new THREE.Vector3()) {
   return target.set(-Math.sin(rotationY), 0, -Math.cos(rotationY)).normalize();
-}
-
-export function getSwordBladeLength(level) {
-  return baseBladeLength * 2 ** Math.max(level - 1, 0);
 }
 
 function syncPlayerTransform(state) {
@@ -275,81 +271,72 @@ function syncSwordAnimation(state) {
   state.player.swordPivot.rotation.z = idleSwordAngle;
 }
 
-function createSwordMesh(level) {
+function createSwordMesh(sword) {
   const group = new THREE.Group();
   const handleMaterial = new THREE.MeshStandardMaterial({ color: '#6a4e33' });
   const bladeMaterial = new THREE.MeshStandardMaterial({ color: '#dce7f2' });
   const guardMaterial = new THREE.MeshStandardMaterial({ color: '#f1bf64' });
-  const bladeLength = getSwordBladeLength(level);
-  const handleLength = 0.9;
+  const coreMaterial = new THREE.MeshStandardMaterial({ color: '#88c5f2' });
+  const stats = sword.stats;
+  const bladeLength = stats.bladeLength;
+  const handleLength = stats.handleLength;
   const guardThickness = 0.16;
-  const bladeCenterX = handleLength / 2 + guardThickness / 2 + bladeLength / 2;
 
+  const handleGroup = new THREE.Group();
+  handleGroup.rotation.z = stats.handleAngle;
   const handle = new THREE.Mesh(
     new THREE.CylinderGeometry(0.08, 0.08, handleLength, 8),
     handleMaterial
   );
   handle.rotation.z = Math.PI / 2;
-  group.add(handle);
+  handleGroup.add(handle);
+  group.add(handleGroup);
 
   const pommel = new THREE.Mesh(
-    new THREE.SphereGeometry(0.13, 10, 10),
+    new THREE.SphereGeometry(stats.pommelSize, 10, 10),
     guardMaterial
   );
-  pommel.position.x = -0.55;
-  group.add(pommel);
+  pommel.position.x = -handleLength / 2 - stats.pommelSize;
+  handleGroup.add(pommel);
 
+  const guardGroup = new THREE.Group();
+  guardGroup.rotation.z = stats.guardAngle;
+  guardGroup.position.x = handleLength / 2 + guardThickness / 2;
   const guard = new THREE.Mesh(
-    new THREE.BoxGeometry(guardThickness, 0.78 + (level - 1) * 0.08, 0.18),
+    new THREE.BoxGeometry(guardThickness, stats.guardWidth, 0.18),
     guardMaterial
   );
-  guard.position.x = handleLength / 2 + guardThickness / 2;
-  group.add(guard);
+  guardGroup.add(guard);
+  group.add(guardGroup);
 
+  const bladeGroup = new THREE.Group();
+  bladeGroup.rotation.z = stats.bladeAngle;
+  bladeGroup.position.x = handleLength / 2 + guardThickness;
   const blade = new THREE.Mesh(
     new THREE.BoxGeometry(bladeLength, 0.18, 0.12),
     bladeMaterial
   );
-  blade.position.x = bladeCenterX;
-  group.add(blade);
+  blade.position.x = bladeLength / 2;
+  bladeGroup.add(blade);
 
   const tip = new THREE.Mesh(
     new THREE.ConeGeometry(0.14, 0.45, 6),
     bladeMaterial
   );
   tip.rotation.z = -Math.PI / 2;
-  tip.position.set(bladeCenterX + bladeLength / 2 + 0.22, 0, 0);
-  group.add(tip);
+  tip.position.set(bladeLength + 0.22, 0, 0);
+  bladeGroup.add(tip);
 
-  if (level >= 2) {
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(0.14, 0.035, 8, 16),
-      guardMaterial
+  if (!sword.isStarter) {
+    const core = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(0.16, 0),
+      coreMaterial
     );
-    ring.rotation.y = Math.PI / 2;
-    ring.position.x = bladeCenterX - bladeLength / 4;
-    group.add(ring);
+    core.position.x = -0.06;
+    bladeGroup.add(core);
   }
 
-  if (level >= 3) {
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(0.14, 0.035, 8, 16),
-      guardMaterial
-    );
-    ring.rotation.y = Math.PI / 2;
-    ring.position.x = bladeCenterX + bladeLength / 8;
-    group.add(ring);
-  }
-
-  if (level >= 4) {
-    const crest = new THREE.Mesh(
-      new THREE.ConeGeometry(0.15, 0.42, 6),
-      guardMaterial
-    );
-    crest.rotation.z = -Math.PI / 2;
-    crest.position.set(bladeCenterX + bladeLength / 2 + 0.55, 0, 0);
-    group.add(crest);
-  }
+  group.add(bladeGroup);
 
   group.rotation.y = Math.PI / 2;
 

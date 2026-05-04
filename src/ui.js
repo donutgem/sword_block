@@ -1,5 +1,11 @@
 import { getSelectedPants, getSelectedTop, pantsOptions, topOptions } from './outfit.js';
 import { getForgePrompt, getForgeState, getSwordBonus, isNearForge } from './progression.js';
+import {
+  describeSword,
+  getAvailableShardCount,
+  getEquippedSword,
+  renderCraftBoard
+} from './swordcraft.js';
 
 export function renderHud(state) {
   const hud = document.querySelector('#hud');
@@ -17,9 +23,9 @@ export function renderHud(state) {
       : 0;
     const healthPercent = Math.max(healthRatio, 0) * 100;
 
-    const ownedSwords = Object.entries(state.inventory.swordsByLevel)
-      .filter(([, count]) => count > 0)
-      .map(([level, count]) => `L${level}: ${count}`)
+    const equippedSword = getEquippedSword(state);
+    const ownedSwords = state.inventory.swords
+      .map((sword) => sword.id === equippedSword.id ? `${sword.name} equipped` : sword.name)
       .join(' | ');
     const spinReady = state.timers.spinCooldown <= 0;
     const spinLabel = spinReady
@@ -31,14 +37,22 @@ export function renderHud(state) {
       ? `
         <div class="hud-panel">
           <h2 class="hud-title">Forge</h2>
-          <p class="hud-help">1: Craft a level 1 sword</p>
-          <p class="hud-help">Needs: blade 1, guard 1, pommel 1</p>
-          <p class="hud-help">${forgeState.canCraft ? 'Ready to craft.' : 'Not enough shards yet.'}</p>
-          <p class="hud-help">2: Combine matching swords</p>
+          <p class="hud-help">1 blade, 2 guard, 3 pommel</p>
+          <p class="hud-help">Move cursor with WASD or arrows. Enter places a shard.</p>
+          <div class="craft-board">${renderCraftBoard(state)}</div>
+          <p class="hud-help">Selected: ${state.forge.board.selectedType}</p>
+          <p class="hud-help">
+            Left: blade ${getAvailableShardCount(state, 'blade')},
+            guard ${getAvailableShardCount(state, 'guard')},
+            pommel ${getAvailableShardCount(state, 'pommel')}
+          </p>
+          <p class="hud-help">C confirms the layout. Backspace removes the last shard.</p>
+          <p class="hud-help">${forgeState.canCraft ? 'Ready to form a sword.' : 'Place one of each shard type.'}</p>
+          <p class="hud-help">M: Merge the two newest shard swords</p>
           <p class="hud-help">${
             forgeState.canCombine
-              ? `Ready to combine two level ${forgeState.combineLevel} swords.`
-              : 'Need two swords of the same level.'
+              ? 'Ready to merge.'
+              : 'Need two crafted shard swords.'
           }</p>
           <p class="hud-help">E or Esc: Close forge</p>
         </div>
@@ -60,8 +74,8 @@ export function renderHud(state) {
           <span class="hud-value">${state.player.level}</span>
         </div>
         <div class="hud-card">
-          <span class="hud-label">Sword Level</span>
-          <span class="hud-value">${state.player.swordLevel}</span>
+          <span class="hud-label">Sword</span>
+          <span class="hud-value">${equippedSword.isStarter ? 'Starter' : 'Custom'}</span>
         </div>
         <div class="hud-card">
           <span class="hud-label">Wave</span>
@@ -84,13 +98,16 @@ export function renderHud(state) {
         >${spinLabel}</button>
       </div>
       <div class="hud-section hud-help">
-        Damage: ${state.player.baseDamage} base + ${getSwordBonus(state.player.swordLevel)} sword
+        Damage: ${state.player.baseDamage} base + ${getSwordBonus(state)} sword
       </div>
       <div class="hud-section hud-help">
         Shards: blade ${state.inventory.blade}, guard ${state.inventory.guard}, pommel ${state.inventory.pommel}
       </div>
       <div class="hud-section hud-swords">
         Swords owned: ${ownedSwords || 'none'}
+      </div>
+      <div class="hud-section hud-swords">
+        Equipped: ${equippedSword.name} (${describeSword(equippedSword)})
       </div>
       <div class="hud-note">${forgeText}</div>
       <div class="hud-note">${state.ui.message}</div>

@@ -9,11 +9,31 @@ export function createInput() {
 
     pressed.add(event.code);
 
-    if (
-      ['Space', 'KeyJ', 'KeyK', 'KeyL', 'KeyE', 'Digit1', 'Digit2', 'Escape'].includes(
-        event.code
-      )
-    ) {
+    const gameKeys = [
+      'Space',
+      'Enter',
+      'Backspace',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'KeyA',
+      'KeyC',
+      'KeyD',
+      'KeyE',
+      'KeyJ',
+      'KeyK',
+      'KeyL',
+      'KeyM',
+      'KeyS',
+      'KeyW',
+      'Digit1',
+      'Digit2',
+      'Digit3',
+      'Escape'
+    ];
+
+    if (gameKeys.includes(event.code)) {
       event.preventDefault();
     }
   }
