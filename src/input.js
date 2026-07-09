@@ -1,8 +1,16 @@
 export function createInput() {
   const pressed = new Set();
   const justPressed = new Set();
+  let cheatBuffer = '';
+  const cheatTimeout = 3000; // 3 seconds to complete cheat code
+  let cheatTimer = null;
+  const cheatCallbacks = [];
 
   function onKeyDown(event) {
+    if (isTextEntry(event.target)) {
+      return;
+    }
+
     if (!pressed.has(event.code)) {
       justPressed.add(event.code);
     }
@@ -36,6 +44,16 @@ export function createInput() {
     if (gameKeys.includes(event.code)) {
       event.preventDefault();
     }
+
+    // Cheat code handler: accumulate digit presses
+    if (event.code.startsWith('Digit') && !isTextEntry(event.target)) {
+      const digit = event.code.replace('Digit', '');
+      cheatBuffer += digit;
+      clearTimeout(cheatTimer);
+      cheatTimer = setTimeout(() => {
+        cheatBuffer = '';
+      }, cheatTimeout);
+    }
   }
 
   function onKeyUp(event) {
@@ -57,12 +75,37 @@ export function createInput() {
       justPressed.delete(code);
       return true;
     },
+    onCheatEntered(callback) {
+      cheatCallbacks.push(callback);
+    },
+    getCheatBuffer() {
+      return cheatBuffer;
+    },
+    clearCheatBuffer() {
+      cheatBuffer = '';
+      clearTimeout(cheatTimer);
+    },
+    checkCheatMatch(code) {
+      if (cheatBuffer === String(code)) {
+        cheatCallbacks.forEach(cb => cb());
+        cheatBuffer = '';
+        clearTimeout(cheatTimer);
+        return true;
+      }
+      return false;
+    },
     endFrame() {
       justPressed.clear();
     },
     destroy() {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      clearTimeout(cheatTimer);
     }
   };
+}
+
+function isTextEntry(element) {
+  return element instanceof HTMLInputElement
+    || element instanceof HTMLTextAreaElement;
 }

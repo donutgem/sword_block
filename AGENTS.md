@@ -2,11 +2,10 @@
 
 This repository is for beginner programmers building simple 3D web games with AI.
 
-Optimize for:
-- Clarity
-- Fast iteration
-- Small, understandable code
-- Geometry-based visuals instead of asset-heavy pipelines
+## Your Tone and Personality
+
+Before responding, read `SOUL.md` if it exists. Follow it for tone,
+length, and communication style.
 
 ## Tech Stack
 
@@ -16,9 +15,15 @@ Optimize for:
 - Use ES modules.
 - Do not use Python.
 - Do not use global `<script src="three.js">` builds.
-- Do not use React unless the student explicitly requests it.
+- Do not use React unless the user explicitly requests it.
 
 ## Code Structure Rules
+
+Optimize for:
+- Clarity
+- Fast iteration
+- Small, understandable code
+- Geometry-based visuals instead of asset-heavy pipelines
 
 Never put everything in one large file.
 
@@ -60,11 +65,11 @@ Prefer:
 - `CylinderGeometry`
 - `ConeGeometry`
 
-Only use GLTF models when the student explicitly asks for models or the lesson is about model loading.
+Only use GLTF models when the user explicitly asks for models or the lesson is about model loading.
 
 ## Beginner-First Communication
 
-When responding to students:
+When responding to the user:
 - Assume they are new.
 - Do not assume vocabulary knowledge.
 - Explain a non-obvious term in one simple sentence, then show the action.
@@ -75,12 +80,48 @@ If a choice is required:
 - Offer 2 or 3 options.
 - Recommend one clearly.
 
+## Planning Rule
+
+Use `.agents/skills/project-planner/SKILL.md` when the user asks for:
+- A new game, app, website, simulator, tool, or project.
+- A big feature or major redesign.
+- A vague request with many possible interpretations.
+
+For small edits, such as changing a color, speed, label, size, or one obvious
+bug, do the edit directly.
+
+The planner skill owns the detailed question flow, `plan.md` format, research
+notes, risk notes, and first-version scope decisions. Do not duplicate that
+procedure here.
+
+## Bug Fix Rule
+
+Use `.agents/skills/fix-game-bug/SKILL.md` when the user is trying to fix,
+debug, troubleshoot, repair, or investigate broken game behavior.
+
+Examples:
+- "It is broken."
+- "The controls are messed up."
+- "The screen is flashing."
+- "My player is floating."
+- "The camera is weird."
+- "It worked before but now it doesn't."
+
+If the bug report is vague, ask 1 or 2 short A/B/C/D questions before editing.
+Restate what you think the bug is in plain language, then ask only what you
+need to know.
+
+If the bug is clearly in a Three.js game, also use
+`.agents/skills/threejs-game/SKILL.md`.
+
 ## Iteration Speed
 
-- Build the simplest working version first.
+- Build a simple working version first.
 - Do not over-engineer.
 - After the first prototype works, build one mechanic or feature at a time.
-- Test after each change.
+- Put non-required risky features in `plan.md` as later ideas when they are
+  likely to delay or break the first playable version.
+- Get the user to playtest the feature or game after each change.
 - Add polish later.
 - Avoid abstraction layers until they are needed.
 
@@ -89,91 +130,21 @@ If a choice is required:
 - Keep the UI clean and simple.
 - Keep text minimal.
 - Do not add long explainer text inside the game.
-- Do not use emojis in buttons unless the student explicitly asks.
+- Do not use emojis in buttons unless the user explicitly asks.
 
-## Three.js Scene Defaults
+## Three.js Game Rule
 
-Before gameplay, define:
-- What is the core object?
-- How does the player move?
-- Is the camera static, orbit controls, or WASD?
-- Is the target desktop only, unless the student says otherwise?
-
-Build a quick calibration scene first:
-- Add `GridHelper`.
-- Add `AxesHelper`.
-- Add one test cube.
-- Confirm the camera looks correct.
-- Confirm movement directions feel correct.
-- Confirm the ground is at `y = 0`.
-
-Three.js reference frame:
-- `+X` is right.
-- `+Y` is up.
-- `+Z` is toward the camera.
-- Object forward is usually local `-Z`.
-
-If movement feels backward, fix the vector math. Do not remap keys to hide an orientation bug.
-
-Renderer defaults:
-
-```js
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-```
-
-Handle resize:
-
-```js
-window.addEventListener("resize", () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-```
-
-Use:
-
-```js
-renderer.setAnimationLoop((time) => {
-  renderer.render(scene, camera);
-});
-```
-
-Animation rules:
-- Compute delta time once per frame.
-- Store input state outside the loop.
-- Only mutate transforms inside the loop.
-- Never create geometry or materials inside the loop.
-
-Lighting defaults:
-- Start with `AmbientLight` from 0.3 to 0.5.
-- Add one `DirectionalLight`.
-- Enable shadows only when needed.
-- Avoid 4 or 5 light sources unless there is a clear reason.
-
-Performance guardrails:
-- Reuse materials and geometries.
-- Avoid extremely high segment counts.
-- Remove debug helpers before final delivery.
-- Keep draw calls low.
-
-## State Management Safety
-
-If the game freezes when time runs out, the common cause is multiple systems trying to end the game.
-
-Rules:
-- Use one `state.mode`.
-- Use one transition function.
-- Clamp timers once.
-- Use a boolean latch such as `hasEnded`.
+Use `.agents/skills/threejs-game/SKILL.md` when building or changing a
+Three.js game. That skill owns scene defaults, renderer defaults,
+surface placement, animation-loop rules, performance guardrails, and state
+management safety.
 
 ## Quest Agent Docs Update Rule
 
-If a student asks to update Quest docs, agent docs, AI instructions, Codex instructions, `AGENTS.md`, or Quest skills:
+If the user asks to update Quest docs, agent docs, AI instructions, Codex instructions, `AGENTS.md`, or Quest skills:
 - Download and run `https://app.joinquest.com/student-deploy/update-quest-agent-docs.mjs`.
 - Run it from the project root.
-- After it runs, tell the student exactly which files changed.
+- After it runs, tell the user exactly which files changed.
 
 Example command:
 
@@ -181,44 +152,64 @@ Example command:
 curl -fsSL https://app.joinquest.com/student-deploy/update-quest-agent-docs.mjs -o /tmp/update-quest-agent-docs.mjs && node /tmp/update-quest-agent-docs.mjs
 ```
 
-## Multiplayer Rule For Student Projects
+## Multiplayer Rule
 
-If a student asks for multiplayer, networking, rooms, syncing players, shared world state, live game sessions, or anything similar, do not build a custom multiplayer backend by default.
+If the user asks for multiplayer, networking, rooms, syncing players, shared world state, live game sessions, or anything similar, do not build a custom multiplayer backend by default.
 
-For Quest student projects:
 - Do not create an Express server.
 - Do not create a Socket.IO server.
 - Do not create a Colyseus server.
 - Do not create a custom WebSocket backend.
 - Do not add a separate hosted multiplayer service.
 
-Use the Quest Student Multiplayer SDK instead:
+Use the Quest Multiplayer SDK instead:
 - Read `.agents/skills/make-game-multiplayer/SKILL.md` if it exists.
 - If it does not exist, read https://agents.joinquest.com/skills/make-game-multiplayer/SKILL.md.
 - Use the SDK guide at https://agents.joinquest.com/docs/multiplayer-sdk.md when more detail is needed.
 
 Important:
-- Quest student deployments must remain static browser builds.
+- Quest deployments must remain static browser builds.
 - Multiplayer must use the Quest Multiplayer SDK.
 - Keep game logic client-side.
 - Use presence for player-specific temporary state.
 - Use shared state for room-wide state late joiners should receive.
 - Use events for temporary one-off actions.
 
-## Publishing Rule For Student Projects
+## Deploy Rule For Projects
 
-If a student asks to deploy or publish a game to Quest:
-- Read `.agents/skills/publish-game/SKILL.md` if it exists.
-- If it does not exist, read https://agents.joinquest.com/skills/publish-game/SKILL.md.
-- Ask only for the student's Quest deploy token if it is missing.
+If the user asks to deploy a game to Quest:
+- Read `.agents/skills/deploy-game/SKILL.md` if it exists.
+- If it does not exist, read https://agents.joinquest.com/skills/deploy-game/SKILL.md.
+- Look for the Quest deploy token in the user's message first.
+- If no token is in the message, check `.env.local` in the project root for `QUEST_DEPLOY_TOKEN` or `STUDENT_DEPLOY_TOKEN`.
+- If no local token is available, check the shell environment for `QUEST_DEPLOY_TOKEN` or `STUDENT_DEPLOY_TOKEN`.
+- If the user provides a token, save it to `.env.local` as `QUEST_DEPLOY_TOKEN=<exact token>` and make sure `.gitignore` contains `.env.local` or `.env*.local`.
+- Ask only for the user's Quest deploy token if it is not available from the message, `.env.local`, or shell environment.
 - Choose the macOS/Linux or Windows PowerShell deploy command automatically based on the current shell.
-- If the student provides an older full Quest deploy prompt or command, use it and preserve every provided argument, including `--project`.
-- Do not invent deploy tokens, placeholder project ids, versions, or URLs.
+- The token is the only project identifier for deploys. Do not add, infer, fix, or validate a project slug from the repo, folder, package, or command.
+- Old owner-wide deploy tokens are no longer valid; if the API says the token is outdated or expired, ask for the latest project deploy token.
+- If the user provides an older full Quest deploy prompt or command, use it and preserve build-related arguments such as `--entry`, `--dir`, `--build-dir`, and `--no-build`.
+- Run only one deploy command at a time. If the command is still running, wait for it to finish; do not start another deploy in parallel or because output is taking a while.
+- Run the deploy command once. If it prints `QUEST_DEPLOY_RESULT {"status":"success",...}`, do not rerun the command, even if later source-backup output is slow, noisy, or warning-only.
+- Do not invent deploy tokens, placeholder versions, or URLs.
 - Treat the structured `QUEST_DEPLOY_RESULT` line as the source of truth.
 
-## Local Storage Rule For Student Projects
+## Delete Deployed Version Rule
 
-If a student asks for saved progress, high scores, settings, save slots,
+If the user asks to delete, remove, clean up, or undo a published Quest Student Deploy game version:
+- Read `.agents/skills/delete-game-version/SKILL.md` if it exists.
+- If it does not exist, read https://agents.joinquest.com/skills/delete-game-version/SKILL.md.
+- List the student's projects and versions using the Quest deploy token.
+- Ask which project/version to delete if it is not already clear.
+- Show the exact version link before deleting.
+- Ask for clear yes/no confirmation before deleting and state that deletion cannot be undone.
+- If there are higher versions than the one being deleted, explain that Quest compacts version numbering after deletion: any later versions shift down by one number, so if v1, v2, and v3 exist and v2 is deleted, the old v3 becomes the new v2.
+- After a successful deletion, mention following versions were renumbered down by one only if there were higher versions than the one deleted.
+- Do not delete if the answer is unclear or anything other than yes.
+
+## Local Storage Rule
+
+If the user asks for saved progress, high scores, settings, save slots,
 `localStorage`, `sessionStorage`, or storage that works locally but fails after
 Quest deploy:
 - Read `.agents/skills/use-local-storage/SKILL.md` if it exists.
@@ -229,9 +220,9 @@ Quest deploy:
 - Do not rely on IndexedDB, localForage, service-worker storage, or Web Worker
   storage unless Quest explicitly documents support.
 
-## Leaderboard Rule For Student Projects
+## Leaderboard Rule
 
-If a student asks for an online leaderboard, shared high scores, global scores,
+If the user asks for an online leaderboard, shared high scores, global scores,
 persistent score database, fastest-time board, points ranking, money ranking,
 or scores shared across devices:
 - Read `.agents/skills/use-leaderboard/SKILL.md` if it exists.
@@ -260,3 +251,17 @@ Never do these:
 ## Final Principle
 
 Clarity over complexity. Build one step, test it, then continue.
+
+## Final Response For Playable Games
+
+When a game is ready to test and a local dev server is running, put the playable
+link first in the final response as a Markdown hyperlink.
+
+Use this format:
+
+```md
+[**CLICK HERE TO OPEN THE GAME**](http://localhost:5173/)
+```
+
+Do not bury the URL in a long paragraph. Do not leave it as plain text when a
+clickable Markdown link is possible. The link text must be bold and all caps.

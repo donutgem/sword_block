@@ -4,6 +4,8 @@ const desiredCameraPosition = new THREE.Vector3();
 const desiredLookTarget = new THREE.Vector3();
 const cameraLocalOffset = new THREE.Vector3(0.7, 2.7, 3.2);
 const lookLocalOffset = new THREE.Vector3(0.35, 2.0, -8);
+const outfitCameraOffset = new THREE.Vector3(0, 1.45, -6.2);
+const outfitLookOffset = new THREE.Vector3(0, 1.25, 0);
 
 export function createSceneApp(state) {
   const scene = new THREE.Scene();
@@ -21,6 +23,10 @@ export function createSceneApp(state) {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   addLights(scene);
@@ -31,47 +37,59 @@ export function createSceneApp(state) {
 }
 
 export function updateCamera(camera, state) {
-  desiredCameraPosition.copy(cameraLocalOffset);
-  state.player.object.localToWorld(desiredCameraPosition);
+  const isChoosingOutfit = state.mode === 'customize';
+  const positionOffset = isChoosingOutfit ? outfitCameraOffset : cameraLocalOffset;
+  const targetOffset = isChoosingOutfit ? outfitLookOffset : lookLocalOffset;
 
-  desiredLookTarget.copy(lookLocalOffset);
-  state.player.object.localToWorld(desiredLookTarget);
+  if (isChoosingOutfit) {
+    desiredCameraPosition.copy(positionOffset);
+    desiredCameraPosition.add(state.player.position);
+
+    desiredLookTarget.copy(targetOffset);
+    desiredLookTarget.add(state.player.position);
+  } else {
+    desiredCameraPosition.copy(positionOffset);
+    state.player.object.localToWorld(desiredCameraPosition);
+
+    desiredLookTarget.copy(targetOffset);
+    state.player.object.localToWorld(desiredLookTarget);
+  }
 
   camera.position.copy(desiredCameraPosition);
   camera.lookAt(desiredLookTarget);
 }
 
 function addLights(scene) {
-  const ambientLight = new THREE.AmbientLight('#ffffff', 0.42);
-  scene.add(ambientLight);
+  const fillLight = new THREE.HemisphereLight('#d8f4ff', '#38515c', 0.8);
+  scene.add(fillLight);
 
-  const directionalLight = new THREE.DirectionalLight('#fff5d8', 1.15);
-  directionalLight.position.set(6, 12, 8);
+  const directionalLight = new THREE.DirectionalLight('#fff2d2', 2.1);
+  directionalLight.position.set(8, 14, 7);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.mapSize.set(1024, 1024);
+  directionalLight.shadow.camera.near = 1;
+  directionalLight.shadow.camera.far = 42;
+  directionalLight.shadow.camera.left = -22;
+  directionalLight.shadow.camera.right = 22;
+  directionalLight.shadow.camera.top = 22;
+  directionalLight.shadow.camera.bottom = -22;
+  directionalLight.shadow.bias = -0.001;
   scene.add(directionalLight);
 }
 
 function addArena(scene, state) {
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(42, 42),
-    new THREE.MeshStandardMaterial({ color: '#739f73' })
+    new THREE.MeshStandardMaterial({ color: '#58a85c' })
   );
   ground.rotation.x = -Math.PI / 2;
+  ground.rotation.z = Math.PI / 2;
+  ground.receiveShadow = true;
   scene.add(ground);
-
-  const grid = new THREE.GridHelper(40, 20, '#466554', '#63856f');
-  grid.position.y = 0.02;
-  scene.add(grid);
 
   const axes = new THREE.AxesHelper(2.4);
   axes.position.set(0, 0.04, 0);
   scene.add(axes);
-
-  const calibrationCube = new THREE.Mesh(
-    new THREE.BoxGeometry(1.4, 1.4, 1.4),
-    new THREE.MeshStandardMaterial({ color: '#f6f7fb' })
-  );
-  calibrationCube.position.set(-state.arena.halfSize + 3, 0.7, state.arena.halfSize - 3);
-  scene.add(calibrationCube);
 
   const wallMaterial = new THREE.MeshStandardMaterial({ color: '#7f6758' });
   const northWall = new THREE.Mesh(
@@ -79,6 +97,8 @@ function addArena(scene, state) {
     wallMaterial
   );
   northWall.position.set(0, 0.75, -state.arena.halfSize - 0.5);
+  northWall.castShadow = true;
+  northWall.receiveShadow = true;
   scene.add(northWall);
 
   const southWall = northWall.clone();
@@ -90,6 +110,8 @@ function addArena(scene, state) {
     wallMaterial
   );
   eastWall.position.set(state.arena.halfSize + 0.5, 0.75, 0);
+  eastWall.castShadow = true;
+  eastWall.receiveShadow = true;
   scene.add(eastWall);
 
   const westWall = eastWall.clone();
@@ -122,6 +144,13 @@ function addForge(scene, state) {
   ring.rotation.x = Math.PI / 2;
   ring.position.y = 0.15;
   forge.add(ring);
+
+  forge.traverse((mesh) => {
+    if (mesh.isMesh) {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    }
+  });
 
   scene.add(forge);
   state.forge.object = forge;

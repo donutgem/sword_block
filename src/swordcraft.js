@@ -3,11 +3,14 @@ import * as THREE from 'three';
 const shardTypes = ['blade', 'guard', 'pommel'];
 const boardWidth = 7;
 const boardHeight = 5;
+const advancedShardCraftLevel = 15;
 
 export function createStarterSword() {
   return {
     id: 'starter',
     name: 'Starter Sword',
+    kind: 'sword',
+    components: ['blade', 'guard', 'pommel'],
     isStarter: true,
     stats: {
       damageBonus: 4,
@@ -34,6 +37,19 @@ export function getEquippedSword(state) {
   return state.inventory.swords.find((sword) => sword.id === state.player.equippedSwordId)
     || state.inventory.swords[0]
     || createStarterSword();
+}
+
+export function equipSword(state, swordId) {
+  const sword = state.inventory.swords.find((candidate) => candidate.id === swordId);
+
+  if (!sword) {
+    return false;
+  }
+
+  state.player.equippedSwordId = sword.id;
+  state.player.swordVersion += 1;
+  setCraftMessage(state, `${sword.name} equipped.`, 2);
+  return true;
 }
 
 export function getSwordDamageBonus(state) {
@@ -69,13 +85,18 @@ export function moveCraftCursor(state, dx, dy) {
 
 export function placeSelectedShard(state) {
   const type = state.forge.board.selectedType;
+  const cursor = state.forge.board.cursor;
 
   if (getAvailableShardCount(state, type) <= 0) {
     setCraftMessage(state, `No ${type} shards left to place.`, 2);
     return false;
   }
 
-  const cursor = state.forge.board.cursor;
+  if (isCraftCellOccupied(state.forge.board, cursor.x, cursor.y)) {
+    setCraftMessage(state, 'That square already has a shard. Move to an empty square.', 2);
+    return false;
+  }
+
   state.forge.board.placed.push({ type, x: cursor.x, y: cursor.y });
   setCraftMessage(state, `Placed a ${type} shard.`, 1.5);
   return true;
@@ -93,14 +114,24 @@ export function undoPlacedShard(state) {
 }
 
 export function canConfirmSword(state) {
-  return shardTypes.every((type) =>
-    state.forge.board.placed.some((shard) => shard.type === type)
-  );
+  return getCraftBlockReason(state) === '';
+}
+
+export function getCraftStatusText(state) {
+  const blockReason = getCraftBlockReason(state);
+
+  if (blockReason) {
+    return blockReason;
+  }
+
+  return 'Ready to form a weapon.';
 }
 
 export function confirmShardSword(state) {
-  if (!canConfirmSword(state)) {
-    setCraftMessage(state, 'Place at least 1 blade, 1 guard, and 1 pommel shard.', 3);
+  const blockReason = getCraftBlockReason(state);
+
+  if (blockReason) {
+    setCraftMessage(state, blockReason, 3);
     return false;
   }
 
@@ -127,7 +158,7 @@ export function mergeNewestSwords(state) {
   const candidates = getMergeCandidates(state);
 
   if (candidates.length < 2) {
-    setCraftMessage(state, 'Craft two shard swords before merging.', 3);
+    setCraftMessage(state, 'Craft two shard weapons before merging.', 3);
     return false;
   }
 
@@ -162,16 +193,19 @@ export function renderCraftBoard(state) {
 
 export function describeSword(sword) {
   const stats = sword.stats;
-  return `${stats.bladeLength.toFixed(1)} reach, ${Math.round(stats.damageBonus)} bonus`;
+  return `${getWeaponKindLabel(sword)}: ${stats.bladeLength.toFixed(1)} reach, ${Math.round(stats.damageBonus)} bonus`;
 }
 
 function createSwordFromLayout(state) {
   const placed = state.forge.board.placed.map((shard) => ({ ...shard }));
   const stats = buildStatsFromLayout(placed);
+  const components = getUsedShardTypes(placed);
 
   return {
     id: `sword-${state.nextIds.sword++}`,
-    name: `Shard Sword ${state.nextIds.sword - 1}`,
+    name: `${getWeaponName(components)} ${state.nextIds.sword - 1}`,
+    kind: components.length === 3 ? 'sword' : 'custom',
+    components,
     isStarter: false,
     layout: placed,
     stats
@@ -182,6 +216,8 @@ function createMergedSword(state, first, second) {
   return {
     id: `sword-${state.nextIds.sword++}`,
     name: `Merged Sword ${state.nextIds.sword - 1}`,
+    kind: 'merged',
+    components: mergeComponents(first.components, second.components),
     isStarter: false,
     layout: [],
     stats: {
@@ -201,11 +237,19 @@ function buildStatsFromLayout(layout) {
   const blade = analyzePart(layout, 'blade');
   const guard = analyzePart(layout, 'guard');
   const pommel = analyzePart(layout, 'pommel');
+  const components = getUsedShardTypes(layout);
   const bladeDropAngle = getBladeDropAngle(blade.count);
+  const isBladeOnly = components.length === 1 && components[0] === 'blade';
+  const isGuardOnly = components.length === 1 && components[0] === 'guard';
+  const isPommelOnly = components.length === 1 && components[0] === 'pommel';
 
   return {
-    damageBonus: 3 + blade.count * 2 + guard.count + pommel.count,
-    bladeLength: 0.9 + blade.count * 0.22 + blade.span * 0.18,
+    damageBonus: 3 + blade.count * 2 + guard.count * 1.5 + pommel.count * 1.7,
+    bladeLength: getWeaponReach(blade, guard, pommel, {
+      isBladeOnly,
+      isGuardOnly,
+      isPommelOnly
+    }),
     bladeAngle: THREE.MathUtils.clamp(blade.angle - bladeDropAngle, -0.8, 0.8),
     guardWidth: 0.45 + guard.count * 0.1 + guard.span * 0.16,
     guardAngle: guard.angle,
@@ -213,6 +257,83 @@ function buildStatsFromLayout(layout) {
     handleAngle: averageAngle(guard.angle, pommel.angle),
     pommelSize: 0.12 + pommel.count * 0.035 + pommel.span * 0.025
   };
+}
+
+function getUsedShardTypes(layout) {
+  return shardTypes.filter((type) => layout.some((shard) => shard.type === type));
+}
+
+function getCraftBlockReason(state) {
+  const placed = state.forge.board.placed;
+
+  if (placed.length === 0) {
+    return 'Place at least 1 shard before crafting.';
+  }
+
+  if (getUsedShardTypes(placed).length < shardTypes.length && state.player.level < advancedShardCraftLevel) {
+    return `One-type and two-type weapons unlock at level ${advancedShardCraftLevel}.`;
+  }
+
+  return '';
+}
+
+function isCraftCellOccupied(board, x, y) {
+  return board.placed.some((shard) => shard.x === x && shard.y === y);
+}
+
+function getWeaponName(components) {
+  if (components.length === 1) {
+    return getComponentWeaponName(components[0]);
+  }
+
+  if (components.length === 2) {
+    return components.map(getComponentWeaponName).join(' + ');
+  }
+
+  return 'Shard Sword';
+}
+
+function getWeaponKindLabel(sword) {
+  if (sword.components?.length > 0) {
+    return getWeaponName(sword.components);
+  }
+
+  return sword.name;
+}
+
+function getComponentWeaponName(type) {
+  if (type === 'blade') {
+    return 'Ninja Star';
+  }
+
+  if (type === 'guard') {
+    return 'Staff';
+  }
+
+  return 'Weighted Balls';
+}
+
+function getWeaponReach(blade, guard, pommel, flags) {
+  if (flags.isBladeOnly) {
+    return 1.15 + blade.count * 0.08 + blade.span * 0.1;
+  }
+
+  if (flags.isGuardOnly) {
+    return 2.1 + guard.count * 0.18 + guard.span * 0.16;
+  }
+
+  if (flags.isPommelOnly) {
+    return 1.45 + pommel.count * 0.12 + pommel.span * 0.12;
+  }
+
+  return 1 + blade.count * 0.18 + guard.count * 0.12 + pommel.count * 0.1
+    + (blade.span + guard.span + pommel.span) * 0.08;
+}
+
+function mergeComponents(firstComponents = [], secondComponents = []) {
+  return shardTypes.filter((type) =>
+    firstComponents.includes(type) || secondComponents.includes(type)
+  );
 }
 
 function getBladeDropAngle(bladeShardCount) {
@@ -251,7 +372,9 @@ function mergeSize(a, b, scale) {
 }
 
 function removeStarterSword(state) {
+  const hadStarterSword = state.inventory.swords.some((sword) => sword.isStarter);
   state.inventory.swords = state.inventory.swords.filter((sword) => !sword.isStarter);
+  return hadStarterSword;
 }
 
 function getMergeCandidates(state) {

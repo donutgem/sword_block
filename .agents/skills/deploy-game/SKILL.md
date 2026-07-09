@@ -1,27 +1,48 @@
 ---
-name: publish-game
-description: Use when a Quest student asks to deploy, publish, upload, release, or update a browser game through Quest Student Deploy. This skill explains the static hosting limits, deploy command handling, success parsing, and failure responses.
+name: deploy-game
+description: Use when a Quest student asks to deploy, upload, release, or update a browser game through Quest Student Deploy. This skill explains the static hosting limits, deploy command handling, success parsing, and failure responses.
 ---
 
-# Publish A Quest Student Game
+# Deploy A Quest Student Game
 
-Use this skill when a student asks to deploy or publish a game to Quest Student Deploy.
+Use this skill when a student asks to deploy a game to Quest Student Deploy.
 
 Quest Student Deploy accepts static browser builds only: HTML, CSS, JavaScript, and asset files. If the project needs multiplayer, it must use the Quest Multiplayer SDK in the browser client.
+
+Uploads are capped at 100 MiB per file, 250 MiB total across allowed files, and
+300 files per upload. The runner also uploads a latest-only admin source
+snapshot zip capped at 200 MiB after excluding build output, `node_modules`,
+and common cache folders.
 
 ## Before Running Deploy
 
 Check:
-- The student provided their Quest deploy token.
+- A project-specific Quest deploy token is available from the student's message, local token storage, or shell environment.
 - The project builds to static browser files.
 - Backend folders or server entry files are not part of the deploy output.
 - Large assets are not accidentally included from `node_modules`, cache folders, or source snapshots.
 
-If the Quest deploy token is missing, ask the student for the token only. Do not ask for a full deploy command unless a token-based deploy fails and the error says a project-specific command or value is required.
+## Deploy Token Handling
 
-If the student provides an older full Quest deploy prompt or command, use the command for the current shell and preserve every provided argument, including `--project`, `--entry`, `--dir`, `--build-dir`, and `--no-build`.
+Resolve the Quest deploy token in this order:
+1. The student's current message, including a full Quest deploy prompt or command.
+2. `.env.local` in the project root, first `QUEST_DEPLOY_TOKEN`, then `STUDENT_DEPLOY_TOKEN`.
+3. Existing shell environment variables, first `QUEST_DEPLOY_TOKEN`, then `STUDENT_DEPLOY_TOKEN`.
+4. If no token is available, ask the student for the token for this project only.
 
-Do not invent placeholder tokens, project ids, versions, or URLs.
+If the student provides a token in chat or in an older full deploy command, save it before deploying:
+
+```txt
+QUEST_DEPLOY_TOKEN=<exact token>
+```
+
+Write that line to `.env.local` in the project root. Preserve other existing `.env.local` entries when possible. Make sure `.gitignore` contains `.env.local` or `.env*.local` so the token is not committed or shared. Do not print the token back in the final response.
+
+The token is the only project identifier for deploys. Do not add, infer, fix, or validate a project slug from the repo, folder, package, or command. Old owner-wide deploy tokens are no longer valid; if the API says the token is outdated or expired, ask for the latest project deploy token.
+
+If the student provides an older full Quest deploy prompt or command, use the command for the current shell. Preserve build-related arguments such as `--entry`, `--dir`, `--build-dir`, and `--no-build`; project names and slugs are not needed.
+
+Do not invent placeholder tokens, versions, or URLs.
 
 ## Static Hosting Rules
 
@@ -73,19 +94,23 @@ If the project needs multiplayer:
 
 Choose the command for the current shell automatically. Do not ask the student whether they use macOS, Linux, or Windows unless the environment cannot run either command.
 
+Run only one deploy command at a time. If the command is still running, wait for it to finish; do not start another deploy in parallel or because output is taking a while.
+
+Run the deploy command once. Do not add `--project`; the deploy token selects the Quest project. If the runner prints `QUEST_DEPLOY_RESULT {"status":"success",...}`, do not rerun the command, even if later source-backup output is slow, noisy, or warning-only.
+
 For macOS/Linux shells:
 
 ```bash
-curl -fsSL "https://app.joinquest.com/student-deploy/runner.js" | node - --token "<QUEST_DEPLOY_TOKEN>" --api-base "https://app.joinquest.com"
+curl -fsSL "https://app.joinquest.com/student-deploy/runner.js" | node - --api-base "https://app.joinquest.com"
 ```
 
 For Windows PowerShell:
 
 ```powershell
-(iwr "https://app.joinquest.com/student-deploy/runner.js" -UseBasicParsing).Content | node - --token "<QUEST_DEPLOY_TOKEN>" --api-base "https://app.joinquest.com"
+(iwr "https://app.joinquest.com/student-deploy/runner.js" -UseBasicParsing).Content | node - --api-base "https://app.joinquest.com"
 ```
 
-Replace `<QUEST_DEPLOY_TOKEN>` with the exact token from the student, preserving all characters.
+The runner reads the token from `.env.local` or shell environment variables. If you are intentionally using a one-off token instead, pass `--token "<QUEST_DEPLOY_TOKEN>"` and preserve all characters.
 
 Ask questions only if the command fails or required auth is missing.
 
@@ -134,12 +159,22 @@ If rate limit reached, reply with only:
 - You've hit the limit of 5 game updates/versions in the last 24 hours
 ```
 
-If upload size limit reached, reply with only:
+If upload size limit reached and `QUEST_DEPLOY_RESULT` includes `largestFiles`,
+include the largest file details in the response. Reply with only:
 
 ```txt
 - Failed
-- Your Quest upload is over the total upload limit or per-file upload limit; build first and deploy only the browser output folder, then reduce large assets if needed
+- Your Quest upload is over the total upload limit or per-file upload limit. Limit: 100 MiB per file, 250 MiB total. Largest files: <path> (<size>), <path> (<size>). Build first and deploy only the browser output folder, then reduce or compress large assets if needed.
 ```
+
+If Node fails with `UNABLE_TO_VERIFY_LEAF_SIGNATURE` on Windows but PowerShell can download `runner.js`, retry with Node's Windows certificate store:
+
+```powershell
+$env:NODE_OPTIONS="--use-system-ca"
+(iwr "https://app.joinquest.com/student-deploy/runner.js" -UseBasicParsing).Content | node - --api-base "https://app.joinquest.com"
+```
+
+Do not use `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 
 If another failure happens, tell the student to send Ben or Felipe:
 
@@ -151,5 +186,5 @@ If another failure happens, tell the student to send Ben or Felipe:
 
 ## More Detail
 
-For the full publishing reference, read:
-https://agents.joinquest.com/docs/publishing.md
+For the full deploy reference, read:
+https://agents.joinquest.com/docs/deploy.md

@@ -1,3 +1,4 @@
+import { getSelectedHair, hairOptions } from './hair.js';
 import { getSelectedPants, getSelectedTop, pantsOptions, topOptions } from './outfit.js';
 import { getForgePrompt, getForgeState, getSwordBonus, isNearForge } from './progression.js';
 import {
@@ -9,6 +10,22 @@ import {
 
 export function renderHud(state) {
   const hud = document.querySelector('#hud');
+
+  if (hud.contains(document.activeElement)
+    && document.activeElement.dataset.input === 'player-name') {
+    return;
+  }
+
+  if (!state.ui.menuOpen) {
+    const markup = renderCollapsedMenu(state);
+
+    if (hud.innerHTML !== markup) {
+      hud.innerHTML = markup;
+    }
+
+    return;
+  }
+
   let markup = '';
 
   if (state.mode === 'customize') {
@@ -24,9 +41,7 @@ export function renderHud(state) {
     const healthPercent = Math.max(healthRatio, 0) * 100;
 
     const equippedSword = getEquippedSword(state);
-    const ownedSwords = state.inventory.swords
-      .map((sword) => sword.id === equippedSword.id ? `${sword.name} equipped` : sword.name)
-      .join(' | ');
+    const weaponSwitcher = renderWeaponSwitcher(state, equippedSword);
     const spinReady = state.timers.spinCooldown <= 0;
     const spinLabel = spinReady
       ? 'Spin Attack'
@@ -38,7 +53,9 @@ export function renderHud(state) {
         <div class="hud-panel">
           <h2 class="hud-title">Forge</h2>
           <p class="hud-help">1 blade, 2 guard, 3 pommel</p>
-          <p class="hud-help">Move cursor with WASD or arrows. Enter places a shard.</p>
+          <p class="hud-help">Before level 15, use blade, guard, and pommel together.</p>
+          <p class="hud-help">Level 15 unlocks one-type and two-type shard weapons.</p>
+          <p class="hud-help">Move cursor with WASD. Enter places a shard.</p>
           <div class="craft-board">${renderCraftBoard(state)}</div>
           <p class="hud-help">Selected: ${state.forge.board.selectedType}</p>
           <p class="hud-help">
@@ -47,8 +64,8 @@ export function renderHud(state) {
             pommel ${getAvailableShardCount(state, 'pommel')}
           </p>
           <p class="hud-help">C confirms the layout. Backspace removes the last shard.</p>
-          <p class="hud-help">${forgeState.canCraft ? 'Ready to form a sword.' : 'Place one of each shard type.'}</p>
-          <p class="hud-help">M: Merge the two newest shard swords</p>
+          <p class="hud-help">${forgeState.craftStatusText}</p>
+          <p class="hud-help">M: Merge the two newest crafted weapons</p>
           <p class="hud-help">${
             forgeState.canCombine
               ? 'Ready to merge.'
@@ -60,13 +77,19 @@ export function renderHud(state) {
       : '';
 
     markup = `
-      <h1 class="hud-title">JKL Block Arena</h1>
-      <div class="hud-section">
-        <span class="hud-label">Health Bar</span>
-        <div class="hud-health-bar" aria-label="Player health">
-          <div class="hud-health-fill" style="width: ${healthPercent}%"></div>
+      ${renderMenuHeader('JKL Block Arena')}
+      <div class="hud-section hud-health-section">
+        <span class="hud-label">Health</span>
+        <div
+          class="hud-health-circle"
+          style="--health-percent: ${healthPercent}%"
+          aria-label="Player health"
+        >
+          <div class="hud-health-center">
+            <span class="hud-health-number">${state.player.health}</span>
+            <span class="hud-health-total">/ ${state.player.maxHealth}</span>
+          </div>
         </div>
-        <div class="hud-health-text">${state.player.health} / ${state.player.maxHealth}</div>
       </div>
       <div class="hud-grid">
         <div class="hud-card">
@@ -74,43 +97,38 @@ export function renderHud(state) {
           <span class="hud-value">${state.player.level}</span>
         </div>
         <div class="hud-card">
-          <span class="hud-label">Sword</span>
+          <span class="hud-label">Weapon</span>
           <span class="hud-value">${equippedSword.isStarter ? 'Starter' : 'Custom'}</span>
         </div>
         <div class="hud-card">
           <span class="hud-label">Wave</span>
           <span class="hud-value">${state.wave}</span>
         </div>
-        <div class="hud-card">
-          <span class="hud-label">Wave Health</span>
-          <span class="hud-value">x1.25 each clear</span>
+        <div class="hud-card hud-spin-card">
+          <button
+            class="hud-action-button${spinDisabledClass}"
+            type="button"
+            data-action="spin-attack"
+            aria-disabled="${spinReady ? 'false' : 'true'}"
+          >${spinLabel}</button>
         </div>
       </div>
       <div class="hud-section hud-help">
-        Controls: J turns right, L turns left, K moves forward, Space thrusts forward, E uses the forge.
-      </div>
-      <div class="hud-action-row">
-        <button
-          class="hud-action-button${spinDisabledClass}"
-          type="button"
-          data-action="spin-attack"
-          aria-disabled="${spinReady ? 'false' : 'true'}"
-        >${spinLabel}</button>
+        Controls: J/L turn, K moves forward, Space attacks, E uses the forge.
       </div>
       <div class="hud-section hud-help">
-        Damage: ${state.player.baseDamage} base + ${getSwordBonus(state)} sword
+        The Starter Sword is available until you craft a new weapon. All crafted weapons are stronger than it.
+      </div>
+      <div class="hud-section hud-help">
+        Damage: ${state.player.baseDamage} base + ${getSwordBonus(state)} weapon
       </div>
       <div class="hud-section hud-help">
         Shards: blade ${state.inventory.blade}, guard ${state.inventory.guard}, pommel ${state.inventory.pommel}
       </div>
-      <div class="hud-section hud-swords">
-        Swords owned: ${ownedSwords || 'none'}
-      </div>
-      <div class="hud-section hud-swords">
-        Equipped: ${equippedSword.name} (${describeSword(equippedSword)})
-      </div>
+      ${weaponSwitcher}
       <div class="hud-note">${forgeText}</div>
-      <div class="hud-note">${state.ui.message}</div>
+      ${renderNotification(state)}
+      ${renderLeaderboard(state)}
       ${forgePanel}
     `;
   }
@@ -120,9 +138,102 @@ export function renderHud(state) {
   }
 }
 
+function renderNotification(state) {
+  const messageClass = getNotificationClass(state.ui.messageTimer);
+
+  return `
+    <div class="hud-note hud-notification ${messageClass}">
+      ${escapeHtml(state.ui.message)}
+    </div>
+  `;
+}
+
+function getNotificationClass(messageTimer) {
+  if (messageTimer <= 0) {
+    return 'is-hidden';
+  }
+
+  if (messageTimer <= 0.35) {
+    return 'is-leaving';
+  }
+
+  return 'is-visible';
+}
+
+function renderMenuHeader(title) {
+  return `
+    <div class="hud-menu-header">
+      <h1 class="hud-title">${title}</h1>
+      <button class="hud-small-button" type="button" data-action="toggle-menu">
+        Hide Menu
+      </button>
+    </div>
+  `;
+}
+
+function renderCollapsedMenu(state) {
+  const title = state.mode === 'customize' ? 'Outfit Menu' : 'Game Menu';
+
+  return `
+    <div class="hud-menu-header hud-menu-header-collapsed">
+      <div>
+        <h1 class="hud-title">${title}</h1>
+        <p class="hud-help">${escapeHtml(state.ui.message)}</p>
+      </div>
+      <button class="hud-small-button" type="button" data-action="toggle-menu">
+        Show Menu
+      </button>
+    </div>
+  `;
+}
+
+function renderWeaponSwitcher(state, equippedSword) {
+  const toggleLabel = state.ui.weaponsOpen ? 'Hide Weapons' : 'Show Weapons';
+  const listMarkup = state.ui.weaponsOpen
+    ? `<div class="hud-weapon-list">${renderWeaponButtons(state, equippedSword)}</div>`
+    : '';
+
+  return `
+    <div class="hud-section hud-swords">
+      <div class="hud-weapon-header">
+        <div>
+          <span class="hud-label">Switch Weapon</span>
+          <strong>${escapeHtml(equippedSword.name)}</strong>
+        </div>
+        <button class="hud-small-button" type="button" data-action="toggle-weapons">
+          ${toggleLabel}
+        </button>
+      </div>
+      ${listMarkup}
+    </div>
+  `;
+}
+
+function renderWeaponButtons(state, equippedSword) {
+  return state.inventory.swords
+    .map((sword) => {
+      const selectedClass = sword.id === equippedSword.id ? ' is-selected' : '';
+      const equippedLabel = sword.id === equippedSword.id ? 'Equipped' : 'Equip';
+
+      return `
+        <button
+          class="hud-weapon-button${selectedClass}"
+          type="button"
+          data-weapon-id="${escapeHtml(sword.id)}"
+        >
+          <span>${escapeHtml(sword.name)}</span>
+          <small>${escapeHtml(describeSword(sword))}</small>
+          <strong>${equippedLabel}</strong>
+        </button>
+      `;
+    })
+    .join('');
+}
+
 function renderOutfitPicker(state) {
   const selectedTop = getSelectedTop(state);
   const selectedPants = getSelectedPants(state);
+  const selectedHair = getSelectedHair(state);
   const topButtons = topOptions
     .map((option, index) => createOptionButton(
       option.name,
@@ -141,11 +252,20 @@ function renderOutfitPicker(state) {
       index
     ))
     .join('');
+  const hairButtons = hairOptions
+    .map((option, index) => createOptionButton(
+      option.name,
+      `background: ${option.swatch};`,
+      index === state.player.outfit.hairIndex,
+      'hair-index',
+      index
+    ))
+    .join('');
 
   return `
-    <h1 class="hud-title">Choose Your Outfit</h1>
+    ${renderMenuHeader('Choose Your Outfit')}
     <div class="hud-section hud-help">
-      Pick one shirt and one pair of pants before the game starts.
+      Pick clothes and a hairstyle before the game starts.
     </div>
     <div class="hud-section">
       <span class="hud-label">Clothes</span>
@@ -155,8 +275,13 @@ function renderOutfitPicker(state) {
       <span class="hud-label">Pants</span>
       <div class="hud-option-grid">${pantsButtons}</div>
     </div>
-    <div class="hud-note">Top: ${selectedTop.name} | Pants: ${selectedPants.name}</div>
+    <div class="hud-section">
+      <span class="hud-label">Hair</span>
+      <div class="hud-option-grid">${hairButtons}</div>
+    </div>
+    <div class="hud-note">Top: ${selectedTop.name} | Pants: ${selectedPants.name} | Hair: ${selectedHair.name}</div>
     <button class="hud-start-button" type="button" data-action="start-game">Start Game</button>
+    ${renderLeaderboard(state)}
   `;
 }
 
@@ -169,4 +294,59 @@ function createOptionButton(label, swatchStyle, selected, dataName, value) {
       <span>${label}</span>
     </button>
   `;
+}
+
+function renderLeaderboard(state) {
+  const leaderboard = state.leaderboard;
+  let content = '<p class="hud-help">Loading scores...</p>';
+
+  if (leaderboard.status === 'unavailable') {
+    content = '<p class="hud-help">Leaderboard available in the published game.</p>';
+  } else if (leaderboard.entries.length > 0) {
+    const rows = leaderboard.entries
+      .slice(0, 10)
+      .map((entry) => `
+        <li class="leaderboard-row">
+          <span>${entry.rank}. ${escapeHtml(entry.playerName)}</span>
+          <strong>${escapeHtml(entry.displayScore || `${entry.score} blocks`)}</strong>
+        </li>
+      `)
+      .join('');
+
+    content = `<ol class="leaderboard-list">${rows}</ol>`;
+  } else if (leaderboard.status === 'ready') {
+    content = '<p class="hud-help">Be the first to clear a wave.</p>';
+  }
+
+  const rankText = leaderboard.rank
+    ? `<p class="hud-help">Your best rank: #${leaderboard.rank}</p>`
+    : '';
+
+  return `
+    <section class="hud-panel leaderboard-panel">
+      <h2 class="hud-title">Top 10 Blocks</h2>
+      <label class="hud-name-field">
+        <span class="hud-label">Name</span>
+        <input
+          class="hud-name-input"
+          type="text"
+          maxlength="20"
+          data-input="player-name"
+          placeholder="Type your name"
+          value="${escapeHtml(state.leaderboard.playerName)}"
+        />
+      </label>
+      ${content}
+      ${rankText}
+    </section>
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }

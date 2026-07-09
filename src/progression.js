@@ -4,6 +4,7 @@ import {
   canConfirmSword,
   canMergeNewestSwords,
   confirmShardSword,
+  getCraftStatusText,
   getSwordDamageBonus,
   mergeNewestSwords,
   moveCraftCursor,
@@ -19,6 +20,7 @@ export function getSwordBonus(state) {
 export function handleEnemyDefeat(state, scene, position) {
   state.player.level += 1;
   state.player.baseDamage += 1;
+  state.score.blocksDefeated += 1;
 
   const shardType =
     state.shardCycle[state.shardCycleIndex % state.shardCycle.length];
@@ -61,18 +63,19 @@ export function isNearForge(state) {
 export function getForgeState(state) {
   return {
     canCraft: canConfirmSword(state),
-    canCombine: canMergeNewestSwords(state)
+    canCombine: canMergeNewestSwords(state),
+    craftStatusText: getCraftStatusText(state)
   };
 }
 
 export function getForgePrompt(state) {
-  return 'Forge nearby. Press E to open sword crafting.';
+  return 'Forge nearby. Press E to open weapon crafting.';
 }
 
 export function openForge(state) {
   state.mode = 'forge';
   state.ui.forgeOpen = true;
-  setMessage(state, 'Forge opened. Arrange shards, press C to confirm, or M to merge swords.', 4);
+  setMessage(state, 'Forge opened. Arrange shards, press C to confirm, or M to merge weapons.', 4);
 }
 
 export function closeForge(state) {
@@ -102,22 +105,22 @@ export function handleForgeInput(state, input) {
     return;
   }
 
-  if (input.consumePress('ArrowLeft') || input.consumePress('KeyA')) {
+  if (input.consumePress('KeyA')) {
     moveCraftCursor(state, -1, 0);
     return;
   }
 
-  if (input.consumePress('ArrowRight') || input.consumePress('KeyD')) {
+  if (input.consumePress('KeyD')) {
     moveCraftCursor(state, 1, 0);
     return;
   }
 
-  if (input.consumePress('ArrowUp') || input.consumePress('KeyW')) {
+  if (input.consumePress('KeyW')) {
     moveCraftCursor(state, 0, -1);
     return;
   }
 
-  if (input.consumePress('ArrowDown') || input.consumePress('KeyS')) {
+  if (input.consumePress('KeyS')) {
     moveCraftCursor(state, 0, 1);
     return;
   }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createCraftingBoard, createStarterSword } from './swordcraft.js';
 
-const spawnPosition = new THREE.Vector3(0, 0, 10);
+const spawnPosition = new THREE.Vector3(0, 1.5, 10);
 const startingHealth = 50;
 const healthGrowthPerClearedWave = 5 / 4;
 
@@ -9,6 +9,9 @@ export function createGameState() {
   return {
     mode: 'customize',
     wave: 1,
+    score: {
+      blocksDefeated: 0
+    },
     arena: {
       halfSize: 18
     },
@@ -23,6 +26,7 @@ export function createGameState() {
       position: spawnPosition.clone(),
       spawnPosition: spawnPosition.clone(),
       rotationY: 0,
+      rotationX: 0,
       moveSpeed: 6.5,
       turnSpeed: 2.5,
       radius: 0.9,
@@ -32,9 +36,12 @@ export function createGameState() {
       swordVisualLevel: -1,
       outfit: {
         topIndex: 0,
-        pantsIndex: 0
+        pantsIndex: 0,
+        hairIndex: 0
       },
-      outfitMaterials: null
+      outfitMaterials: null,
+      outfitParts: null,
+      hairStyles: null
     },
     inventory: {
       blade: 0,
@@ -43,6 +50,7 @@ export function createGameState() {
       swords: [createStarterSword()]
     },
     enemies: [],
+    projectiles: [],
     pickups: [],
     forge: {
       position: new THREE.Vector3(0, 0, -2),
@@ -64,10 +72,23 @@ export function createGameState() {
     shardCycle: ['blade', 'guard', 'pommel'],
     shardCycleIndex: 0,
     ui: {
-      message: 'Choose your shirt and pants, then press Start Game.',
+      message: 'Choose your clothes and hair, then press Start Game.',
       messageTimer: 0,
-      forgeOpen: false
-    }
+      forgeOpen: false,
+      weaponsOpen: false,
+      menuOpen: true
+    },
+    leaderboard: {
+      playerName: '',
+      entries: [],
+      status: 'loading',
+      rank: null,
+      lastSubmittedScore: 0,
+      selectedType: 'blocks', // 'blocks' or 'fastest'
+      blocksEntries: [],
+      fastestEntries: []
+    },
+    waveStartTime: 0
   };
 }
 
