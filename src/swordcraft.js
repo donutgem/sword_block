@@ -213,21 +213,32 @@ function createSwordFromLayout(state) {
 }
 
 function createMergedSword(state, first, second) {
+  const components = mergeComponents(first.components, second.components);
+
   return {
     id: `sword-${state.nextIds.sword++}`,
     name: `Merged Sword ${state.nextIds.sword - 1}`,
     kind: 'merged',
-    components: mergeComponents(first.components, second.components),
+    components,
     isStarter: false,
     layout: [],
     stats: {
       damageBonus: first.stats.damageBonus + second.stats.damageBonus * 0.8,
       bladeLength: mergeSize(first.stats.bladeLength, second.stats.bladeLength, 0.75),
-      bladeAngle: averageAngle(first.stats.bladeAngle, second.stats.bladeAngle),
+      bladeAngle: getAttackReadyAngle(
+        averageAngle(first.stats.bladeAngle, second.stats.bladeAngle),
+        components
+      ),
       guardWidth: mergeSize(first.stats.guardWidth, second.stats.guardWidth, 0.65),
-      guardAngle: averageAngle(first.stats.guardAngle, second.stats.guardAngle),
+      guardAngle: getAttackReadyAngle(
+        averageAngle(first.stats.guardAngle, second.stats.guardAngle),
+        components
+      ),
       handleLength: mergeSize(first.stats.handleLength, second.stats.handleLength, 0.55),
-      handleAngle: averageAngle(first.stats.handleAngle, second.stats.handleAngle),
+      handleAngle: getAttackReadyAngle(
+        averageAngle(first.stats.handleAngle, second.stats.handleAngle),
+        components
+      ),
       pommelSize: mergeSize(first.stats.pommelSize, second.stats.pommelSize, 0.45)
     }
   };
@@ -243,6 +254,8 @@ function buildStatsFromLayout(layout) {
   const isGuardOnly = components.length === 1 && components[0] === 'guard';
   const isPommelOnly = components.length === 1 && components[0] === 'pommel';
 
+  const bladeAngle = THREE.MathUtils.clamp(blade.angle - bladeDropAngle, -0.8, 0.8);
+
   return {
     damageBonus: 3 + blade.count * 2 + guard.count * 1.5 + pommel.count * 1.7,
     bladeLength: getWeaponReach(blade, guard, pommel, {
@@ -250,13 +263,21 @@ function buildStatsFromLayout(layout) {
       isGuardOnly,
       isPommelOnly
     }),
-    bladeAngle: THREE.MathUtils.clamp(blade.angle - bladeDropAngle, -0.8, 0.8),
+    bladeAngle: getAttackReadyAngle(bladeAngle, components),
     guardWidth: 0.45 + guard.count * 0.1 + guard.span * 0.16,
-    guardAngle: guard.angle,
+    guardAngle: getAttackReadyAngle(guard.angle, components),
     handleLength: 0.55 + guard.count * 0.06 + pommel.count * 0.08,
-    handleAngle: averageAngle(guard.angle, pommel.angle),
+    handleAngle: getAttackReadyAngle(averageAngle(guard.angle, pommel.angle), components),
     pommelSize: 0.12 + pommel.count * 0.035 + pommel.span * 0.025
   };
+}
+
+function getAttackReadyAngle(angle, components) {
+  if (components.length === shardTypes.length) {
+    return THREE.MathUtils.clamp(angle, -0.18, 0.18);
+  }
+
+  return angle;
 }
 
 function getUsedShardTypes(layout) {

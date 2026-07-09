@@ -73,50 +73,26 @@ canvas {
   margin-top: 14px;
 }
 
-.hud-health-section {
-  display: grid;
-  justify-items: start;
-}
-
-.hud-health-circle {
-  display: grid;
-  place-items: center;
-  width: 92px;
-  aspect-ratio: 1;
+.hud-health-bar {
   margin-top: 8px;
-  border-radius: 50%;
-  background:
-    conic-gradient(
-      #8ee07f 0 var(--health-percent),
-      rgba(71, 39, 24, 0.18) var(--health-percent) 100%
-    );
-  box-shadow:
-    inset 0 0 0 1px rgba(20, 33, 46, 0.1),
-    0 10px 24px rgba(28, 55, 74, 0.14);
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(71, 39, 24, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(20, 33, 46, 0.08);
 }
 
-.hud-health-center {
-  display: grid;
-  place-items: center;
-  width: 62px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgba(20, 33, 46, 0.72);
-  color: #ffffff;
-  line-height: 1;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+.hud-health-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff7c67 0%, #ffb250 45%, #8ee07f 100%);
+  transition: width 120ms ease-out;
 }
 
-.hud-health-number {
-  font-size: 1.35rem;
-  font-weight: 800;
-}
-
-.hud-health-total {
-  margin-top: -6px;
-  font-size: 0.72rem;
+.hud-health-text {
+  margin-top: 6px;
+  font-size: 0.95rem;
   font-weight: 700;
-  opacity: 0.9;
 }
 
 .hud-card {
@@ -318,6 +294,7 @@ canvas {
 .hud-spin-card {
   display: flex;
   align-items: stretch;
+  grid-column: 1 / -1;
   padding: 0;
 }
 

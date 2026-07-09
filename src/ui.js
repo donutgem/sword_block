@@ -78,18 +78,12 @@ export function renderHud(state) {
 
     markup = `
       ${renderMenuHeader('JKL Block Arena')}
-      <div class="hud-section hud-health-section">
-        <span class="hud-label">Health</span>
-        <div
-          class="hud-health-circle"
-          style="--health-percent: ${healthPercent}%"
-          aria-label="Player health"
-        >
-          <div class="hud-health-center">
-            <span class="hud-health-number">${state.player.health}</span>
-            <span class="hud-health-total">/ ${state.player.maxHealth}</span>
-          </div>
+      <div class="hud-section">
+        <span class="hud-label">Health Bar</span>
+        <div class="hud-health-bar" aria-label="Player health">
+          <div class="hud-health-fill" style="width: ${healthPercent}%"></div>
         </div>
+        <div class="hud-health-text">${state.player.health} / ${state.player.maxHealth}</div>
       </div>
       <div class="hud-grid">
         <div class="hud-card">
@@ -99,10 +93,6 @@ export function renderHud(state) {
         <div class="hud-card">
           <span class="hud-label">Weapon</span>
           <span class="hud-value">${equippedSword.isStarter ? 'Starter' : 'Custom'}</span>
-        </div>
-        <div class="hud-card">
-          <span class="hud-label">Wave</span>
-          <span class="hud-value">${state.wave}</span>
         </div>
         <div class="hud-card hud-spin-card">
           <button

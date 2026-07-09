@@ -10,7 +10,7 @@ const spawnPositions = [
 ];
 const blockSize = 3;
 const blockHalfSize = blockSize / 2;
-const healthFillHalfWidth = 0.825;
+const healthTextureSize = 128;
 
 export function spawnWave(scene, state, waveNumber) {
   for (const enemy of state.enemies) {
@@ -36,10 +36,7 @@ export function spawnWave(scene, state, waveNumber) {
 export function updateEnemyVisuals(state, delta, elapsedTime) {
   for (const enemy of state.enemies) {
     enemy.flashTimer = Math.max(enemy.flashTimer - delta, 0);
-    enemy.healthFill.scale.x = Math.max(enemy.health / enemy.maxHealth, 0.001);
-    enemy.healthFill.position.x =
-      -healthFillHalfWidth + enemy.healthFill.scale.x * healthFillHalfWidth;
-    syncHealthBarFacing(enemy, state.player.position);
+    updateEnemyHealthCircle(enemy);
     enemy.core.rotation.y = elapsedTime * 0.55 + enemy.id * 0.4;
     syncEnemyFlash(enemy);
   }
@@ -82,29 +79,16 @@ function createEnemy(state, maxHealth, damage, x, z, waveNumber) {
   eye.castShadow = true;
   core.add(eye);
 
-  const healthBarGroup = new THREE.Group();
-  healthBarGroup.position.set(0, blockHalfSize + 0.65, 0);
-  group.add(healthBarGroup);
-
-  const healthBarBack = new THREE.Mesh(
-    new THREE.BoxGeometry(1.8, 0.2, 0.07),
-    new THREE.MeshStandardMaterial({ color: '#123d43' })
-  );
-  healthBarGroup.add(healthBarBack);
-
-  const healthFill = new THREE.Mesh(
-    new THREE.BoxGeometry(1.65, 0.14, 0.08),
-    new THREE.MeshStandardMaterial({ color: '#7ce4cf' })
-  );
-  healthFill.position.z = 0.02;
-  healthBarGroup.add(healthFill);
+  const healthCircle = createHealthCircle(maxHealth, maxHealth);
+  healthCircle.sprite.position.set(0, blockHalfSize + 0.9, 0);
+  healthCircle.sprite.scale.set(1.55, 1.55, 1);
+  group.add(healthCircle.sprite);
 
   return {
     id: state.nextIds.enemy++,
     mesh: group,
     core,
-    healthBarGroup,
-    healthFill,
+    healthCircle,
     health: maxHealth,
     maxHealth,
     damage,
@@ -114,10 +98,83 @@ function createEnemy(state, maxHealth, damage, x, z, waveNumber) {
   };
 }
 
-function syncHealthBarFacing(enemy, playerPosition) {
-  const dx = playerPosition.x - enemy.mesh.position.x;
-  const dz = playerPosition.z - enemy.mesh.position.z;
-  enemy.healthBarGroup.rotation.y = Math.atan2(dx, dz);
+function createHealthCircle(health, maxHealth) {
+  const canvas = document.createElement('canvas');
+  canvas.width = healthTextureSize;
+  canvas.height = healthTextureSize;
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false
+  });
+
+  const healthCircle = {
+    canvas,
+    context: canvas.getContext('2d'),
+    texture,
+    sprite: new THREE.Sprite(material),
+    displayedHealth: null
+  };
+
+  drawHealthCircle(healthCircle, health, maxHealth);
+  return healthCircle;
+}
+
+function updateEnemyHealthCircle(enemy) {
+  if (enemy.healthCircle.displayedHealth === enemy.health) {
+    return;
+  }
+
+  drawHealthCircle(enemy.healthCircle, enemy.health, enemy.maxHealth);
+}
+
+function drawHealthCircle(healthCircle, health, maxHealth) {
+  const context = healthCircle.context;
+  const size = healthTextureSize;
+  const center = size / 2;
+  const radius = 43;
+  const healthRatio = maxHealth > 0 ? Math.max(health / maxHealth, 0) : 0;
+
+  context.clearRect(0, 0, size, size);
+
+  context.lineWidth = 16;
+  context.lineCap = 'round';
+  context.strokeStyle = 'rgba(18, 61, 67, 0.9)';
+  context.beginPath();
+  context.arc(center, center, radius, 0, Math.PI * 2);
+  context.stroke();
+
+  context.strokeStyle = '#7ce4cf';
+  context.beginPath();
+  context.arc(
+    center,
+    center,
+    radius,
+    -Math.PI / 2,
+    -Math.PI / 2 + Math.PI * 2 * healthRatio
+  );
+  context.stroke();
+
+  context.fillStyle = 'rgba(8, 52, 59, 0.82)';
+  context.beginPath();
+  context.arc(center, center, 28, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = '#ffffff';
+  context.font = 'bold 34px Trebuchet MS, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  context.shadowBlur = 5;
+  context.fillText(String(Math.ceil(health)), center, center + 1);
+  context.shadowBlur = 0;
+
+  healthCircle.displayedHealth = health;
+  healthCircle.texture.needsUpdate = true;
 }
 
 function syncEnemyFlash(enemy) {
