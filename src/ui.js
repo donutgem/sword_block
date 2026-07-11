@@ -1,12 +1,15 @@
 import { getSelectedHair, hairOptions } from './hair.js';
 import { getSelectedPants, getSelectedTop, pantsOptions, topOptions } from './outfit.js';
 import { getForgePrompt, getForgeState, getSwordBonus, isNearForge } from './progression.js';
+import { renderStickmanAnimations } from './stickmen.js';
 import {
   describeSword,
   getAvailableShardCount,
   getEquippedSword,
   renderCraftBoard
 } from './swordcraft.js';
+
+let lastHudMarkup = '';
 
 export function renderHud(state) {
   const hud = document.querySelector('#hud');
@@ -19,8 +22,9 @@ export function renderHud(state) {
   if (!state.ui.menuOpen) {
     const markup = renderCollapsedMenu(state);
 
-    if (hud.innerHTML !== markup) {
+    if (lastHudMarkup !== markup) {
       hud.innerHTML = markup;
+      lastHudMarkup = markup;
     }
 
     return;
@@ -123,8 +127,9 @@ export function renderHud(state) {
     `;
   }
 
-  if (hud.innerHTML !== markup) {
+  if (lastHudMarkup !== markup) {
     hud.innerHTML = markup;
+    lastHudMarkup = markup;
   }
 }
 
@@ -257,6 +262,7 @@ function renderOutfitPicker(state) {
     <div class="hud-section hud-help">
       Pick clothes and a hairstyle before the game starts.
     </div>
+    ${renderStickmanAnimations(state)}
     <div class="hud-section">
       <span class="hud-label">Clothes</span>
       <div class="hud-option-grid">${topButtons}</div>

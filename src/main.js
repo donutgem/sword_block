@@ -10,6 +10,7 @@ import { createInput } from './input.js';
 import { setHairOption, syncPlayerHair } from './hair.js';
 import { getWeeklyCheatCode } from './cheatcode.js';
 import { loadLeaderboard, submitWaveScore } from './leaderboard.js';
+import { syncStickmanMovies } from './stickmanMovies.js';
 import {
   setPantsOption,
   setTopOption,
@@ -40,6 +41,7 @@ appRoot.append(renderer.domElement);
 scene.add(player);
 spawnWave(scene, state, 1);
 renderHud(state);
+syncStickmanMovies(hud);
 loadLeaderboard(state);
 hud.addEventListener('input', (event) => {
   if (event.target.dataset.input === 'player-name') {
@@ -74,6 +76,18 @@ hud.addEventListener('pointerdown', (event) => {
   if (button.dataset.hairIndex !== undefined) {
     setHairOption(state, Number(button.dataset.hairIndex));
     syncPlayerHair(state);
+    renderHud(state);
+    return;
+  }
+
+  if (button.dataset.stickmanId !== undefined && state.mode === 'customize') {
+    state.ui.selectedStickman = button.dataset.stickmanId;
+    renderHud(state);
+    return;
+  }
+
+  if (button.dataset.action === 'close-stickman') {
+    state.ui.selectedStickman = null;
     renderHud(state);
     return;
   }
@@ -213,6 +227,7 @@ renderer.setAnimationLoop((time) => {
   }
 
   renderHud(state);
+  syncStickmanMovies(hud);
   renderer.render(scene, camera);
   input.endFrame();
 });
