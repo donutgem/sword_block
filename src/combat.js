@@ -62,7 +62,6 @@ export function performAttack(state, scene) {
     return true;
   }
 
-  setMessage(state, `${getMissMessage(weapon)}`, 2);
   return false;
 }
 
@@ -399,14 +398,6 @@ function getAttackName(weapon) {
   }
 
   return 'Weapon';
-}
-
-function getMissMessage(weapon) {
-  if (isStaffWeapon(weapon)) {
-    return 'Staff sweep missed. Turn toward the block and move closer.';
-  }
-
-  return 'Thrust missed. Turn toward the block and move closer.';
 }
 
 function isOutsideArena(state, position) {

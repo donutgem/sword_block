@@ -10,6 +10,7 @@ import { createInput } from './input.js';
 import { setHairOption, syncPlayerHair } from './hair.js';
 import { getWeeklyCheatCode } from './cheatcode.js';
 import { loadLeaderboard, submitWaveScore } from './leaderboard.js';
+import { setMusicMuted, startBackgroundMusic } from './music.js';
 import { syncStickmanMovies } from './stickmanMovies.js';
 import {
   setPantsOption,
@@ -102,6 +103,7 @@ hud.addEventListener('pointerdown', (event) => {
   }
 
   if (button.dataset.action === 'start-game') {
+    startBackgroundMusic();
     startGameWithOutfit(state);
     renderHud(state);
     return;
@@ -115,6 +117,13 @@ hud.addEventListener('pointerdown', (event) => {
 
   if (button.dataset.action === 'toggle-menu') {
     state.ui.menuOpen = !state.ui.menuOpen;
+    renderHud(state);
+    return;
+  }
+
+  if (button.dataset.action === 'toggle-music') {
+    state.ui.musicMuted = !state.ui.musicMuted;
+    setMusicMuted(state.ui.musicMuted);
     renderHud(state);
     return;
   }

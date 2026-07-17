@@ -9,7 +9,7 @@ const stickmanStories = [
       { speaker: 'Green runner', color: '#238a50', text: 'No slowing down now.' },
       { speaker: 'Orange runner', color: '#d46b1f', text: 'Save one shard for me.' },
       { speaker: 'Orange runner', color: '#d46b1f', text: 'My boots are warmed up.' },
-      { speaker: 'Purple runner', color: '#7448d8', text: 'I am taking the outside lane.' },
+      { speaker: 'Purple runner', color: '#7448d8', text: "I'm taking the outside lane." },
       { speaker: 'Purple runner', color: '#7448d8', text: 'Try to catch me.' }
     ]
   },
@@ -19,7 +19,7 @@ const stickmanStories = [
     speech: 'If the blocks rush us, hop over.',
     color: '#b88400',
     lines: [
-      { speaker: 'Gold jumper', color: '#b88400', text: 'I will jump the block.' },
+      { speaker: 'Gold jumper', color: '#b88400', text: "I'll jump the block." },
       { speaker: 'Gold jumper', color: '#b88400', text: 'Watch the timing.' },
       { speaker: 'Teal coach', color: '#0b8a8f', text: 'Land clean, then keep running.' },
       { speaker: 'Teal coach', color: '#0b8a8f', text: 'The block is not moving.' }
@@ -66,7 +66,6 @@ export function renderStickmanAnimations(state) {
 function renderStickmanCard(story) {
   return `
     <button class="stickman-card" type="button" data-stickman-id="${story.id}">
-      <span class="stickman-hidden-preview" aria-hidden="true"></span>
       <div class="stickman-story">
         <span class="stickman-caption">${story.caption}</span>
         <span class="stickman-watch-label">Click to watch</span>

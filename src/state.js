@@ -77,7 +77,8 @@ export function createGameState() {
       forgeOpen: false,
       weaponsOpen: false,
       menuOpen: true,
-      selectedStickman: null
+      selectedStickman: null,
+      musicMuted: false
     },
     leaderboard: {
       playerName: '',

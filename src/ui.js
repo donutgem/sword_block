@@ -20,7 +20,10 @@ export function renderHud(state) {
   }
 
   if (!state.ui.menuOpen) {
-    const markup = renderCollapsedMenu(state);
+    const markup = `
+      ${renderCollapsedMenu(state)}
+      ${renderMusicButton(state)}
+    `;
 
     if (lastHudMarkup !== markup) {
       hud.innerHTML = markup;
@@ -127,10 +130,34 @@ export function renderHud(state) {
     `;
   }
 
-  if (lastHudMarkup !== markup) {
-    hud.innerHTML = markup;
-    lastHudMarkup = markup;
+  const fullMarkup = `
+    ${markup}
+    ${renderMusicButton(state)}
+  `;
+
+  if (lastHudMarkup !== fullMarkup) {
+    hud.innerHTML = fullMarkup;
+    lastHudMarkup = fullMarkup;
   }
+}
+
+function renderMusicButton(state) {
+  if (state.mode === 'customize') {
+    return '';
+  }
+
+  const mutedClass = state.ui.musicMuted ? ' is-muted' : '';
+  const label = state.ui.musicMuted ? 'Unmute music' : 'Mute music';
+
+  return `
+    <button
+      class="music-circle-button${mutedClass}"
+      type="button"
+      data-action="toggle-music"
+      aria-label="${label}"
+      title="${label}"
+    >M</button>
+  `;
 }
 
 function renderNotification(state) {

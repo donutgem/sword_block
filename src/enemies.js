@@ -21,7 +21,7 @@ export function spawnWave(scene, state, waveNumber) {
   syncPlayerHealthForWave(state, waveNumber);
   state.wave = waveNumber;
 
-  const maxHealth = 20 + (waveNumber - 1) * 5;
+  const maxHealth = (20 + (waveNumber - 1) * 5) * 5;
   const damage = 10 + (waveNumber - 1) * 2;
 
   for (const [x, z] of spawnPositions) {

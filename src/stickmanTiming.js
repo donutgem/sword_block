@@ -1,5 +1,6 @@
-export const frameRate = 10;
-export const intermissionSeconds = 0.8;
+export const animationSlowdown = 2;
+export const frameRate = 10 / animationSlowdown;
+export const intermissionSeconds = 0.8 * animationSlowdown;
 
 export function getMovieFrame(frameCounts, storyId, elapsedSeconds, activeSeconds) {
   const count = frameCounts[storyId] || frameCounts.forge;
@@ -9,7 +10,7 @@ export function getMovieFrame(frameCounts, storyId, elapsedSeconds, activeSecond
     return -1;
   }
 
-  return Math.floor(loopSeconds * frameRate) % count;
+  return (loopSeconds * frameRate) % count;
 }
 
 export function getLoopSeconds(frameCounts, storyId, elapsedSeconds, activeSeconds) {
@@ -18,7 +19,7 @@ export function getLoopSeconds(frameCounts, storyId, elapsedSeconds, activeSecon
   return elapsedSeconds % cycleSeconds;
 }
 
-export function getActiveSeconds(frameCounts, storyId, captionCount, captionSeconds) {
+export function getActiveSeconds(frameCounts, storyId) {
   const count = frameCounts[storyId] || frameCounts.forge;
-  return Math.max(count / frameRate, captionCount * captionSeconds);
+  return count / frameRate;
 }
