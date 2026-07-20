@@ -75,7 +75,10 @@ export function getForgePrompt(state) {
 export function openForge(state) {
   state.mode = 'forge';
   state.ui.forgeOpen = true;
-  setMessage(state, 'Forge opened. Arrange shards, press C to confirm, or M to merge weapons.', 4);
+  const message = canMergeNewestSwords(state)
+    ? 'You have two weapons ready. Press M to merge them for extra power.'
+    : 'Forge opened. Arrange shards and press C to make a weapon.';
+  setMessage(state, message, 4);
 }
 
 export function closeForge(state) {

@@ -4,6 +4,8 @@ const shardTypes = ['blade', 'guard', 'pommel'];
 const boardWidth = 7;
 const boardHeight = 5;
 const advancedShardCraftLevel = 15;
+const mergePowerMultiplier = 1.1;
+export const mergePowerBonusPercent = Math.round((mergePowerMultiplier - 1) * 100);
 
 export function createStarterSword() {
   return {
@@ -146,12 +148,21 @@ export function confirmShardSword(state) {
   state.player.swordVersion += 1;
   state.forge.board = createCraftingBoard();
 
-  setCraftMessage(state, `${sword.name} formed from your shard layout.`, 4);
+  const craftedCount = getMergeCandidateCount(state);
+  const nextStep = craftedCount >= 2
+    ? 'You have a pair now. I would merge them with M.'
+    : 'Nice start. Craft one more and you can merge the pair.';
+
+  setCraftMessage(state, `${sword.name} formed. ${nextStep}`, 5);
   return true;
 }
 
 export function canMergeNewestSwords(state) {
-  return getMergeCandidates(state).length >= 2;
+  return getMergeCandidateCount(state) >= 2;
+}
+
+export function getMergeCandidateCount(state) {
+  return getMergeCandidates(state).length;
 }
 
 export function mergeNewestSwords(state) {
@@ -171,7 +182,11 @@ export function mergeNewestSwords(state) {
   state.player.equippedSwordId = merged.id;
   state.player.swordVersion += 1;
 
-  setCraftMessage(state, `Merged ${first.name} and ${second.name} into ${merged.name}.`, 4);
+  setCraftMessage(
+    state,
+    `Merged into ${merged.name} with an extra ${mergePowerBonusPercent}% power bonus. Good call.`,
+    5
+  );
   return true;
 }
 
@@ -223,7 +238,7 @@ function createMergedSword(state, first, second) {
     isStarter: false,
     layout: [],
     stats: {
-      damageBonus: first.stats.damageBonus + second.stats.damageBonus * 0.8,
+      damageBonus: (first.stats.damageBonus + second.stats.damageBonus) * mergePowerMultiplier,
       bladeLength: mergeSize(first.stats.bladeLength, second.stats.bladeLength, 0.75),
       bladeAngle: getAttackReadyAngle(
         averageAngle(first.stats.bladeAngle, second.stats.bladeAngle),

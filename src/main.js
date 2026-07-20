@@ -29,6 +29,7 @@ import {
 import { createSceneApp, updateCamera } from './scene.js';
 import { createGameState, setMessage } from './state.js';
 import { equipSword } from './swordcraft.js';
+import { attachTutorialKeyboard, handleTutorialPointer, updateTutorial } from './tutorial.js';
 import { renderHud } from './ui.js';
 
 const state = createGameState();
@@ -42,6 +43,7 @@ appRoot.append(renderer.domElement);
 scene.add(player);
 spawnWave(scene, state, 1);
 renderHud(state);
+attachTutorialKeyboard(state, () => renderHud(state));
 syncStickmanMovies(hud);
 loadLeaderboard(state);
 hud.addEventListener('input', (event) => {
@@ -51,7 +53,7 @@ hud.addEventListener('input', (event) => {
     event.target.setAttribute('value', state.leaderboard.playerName);
   }
 });
-hud.addEventListener('pointerdown', (event) => {
+document.addEventListener('pointerdown', (event) => {
   const button = event.target.closest('button');
 
   if (!button) {
@@ -59,6 +61,11 @@ hud.addEventListener('pointerdown', (event) => {
   }
 
   event.preventDefault();
+
+  if (handleTutorialPointer(state, button)) {
+    renderHud(state);
+    return;
+  }
 
   if (button.dataset.topIndex !== undefined) {
     setTopOption(state, Number(button.dataset.topIndex));
@@ -154,6 +161,7 @@ renderer.setAnimationLoop((time) => {
   state.timers.attackAnimation = Math.max(state.timers.attackAnimation - delta, 0);
   state.timers.spinCooldown = Math.max(state.timers.spinCooldown - delta, 0);
   state.timers.spinAnimation = Math.max(state.timers.spinAnimation - delta, 0);
+  updateTutorial(state, delta);
 
   if (state.ui.messageTimer > 0) {
     state.ui.messageTimer = Math.max(state.ui.messageTimer - delta, 0);
@@ -161,7 +169,7 @@ renderer.setAnimationLoop((time) => {
 
   if (state.mode === 'playing') {
     updatePlayer(delta, input, state);
-  } else if (state.mode === 'customize') {
+  } else if (state.mode === 'customize' && !state.ui.tutorial.open) {
     if (input.isDown('KeyJ')) {
       state.player.rotationY += state.player.turnSpeed * delta;
     }
@@ -195,7 +203,7 @@ renderer.setAnimationLoop((time) => {
     performAttack(state, scene);
   }
 
-  if (input.checkCheatMatch(getWeeklyCheatCode())) {
+  if (!state.ui.tutorial.open && input.checkCheatMatch(getWeeklyCheatCode())) {
     const levelGain = Math.max(20 - state.player.level, 0);
     state.player.level += levelGain;
     state.player.baseDamage += levelGain;

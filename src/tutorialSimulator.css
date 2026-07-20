@@ -1,0 +1,243 @@
+.tutorial-simulator {
+  padding: 14px;
+  border: 2px solid #dce8dd;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #f7f2df, #e9f4ea);
+  box-shadow: inset 0 0 28px rgba(109, 158, 139, 0.08);
+}
+
+.tutorial-status {
+  margin-top: 10px;
+  background: #f6ead3;
+  color: #75551c;
+}
+
+.tutorial-status.is-complete {
+  background: #dff4e6;
+  color: #27603c;
+}
+
+.tutorial-mini-arena,
+.tutorial-combat-scene {
+  position: relative;
+  height: 150px;
+  margin: 12px 0;
+  overflow: hidden;
+  border: 1px solid #bdd5c5;
+  border-radius: 16px;
+  background:
+    linear-gradient(rgba(129, 174, 148, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(129, 174, 148, 0.12) 1px, transparent 1px),
+    #eef5df;
+  background-size: 24px 24px;
+}
+
+.tutorial-mini-player {
+  position: absolute;
+  top: calc(50% + var(--player-y));
+  left: calc(50% + var(--player-x));
+  width: 26px;
+  height: 32px;
+  transform: translate(-50%, -50%) rotate(var(--player-angle));
+  transition: top 150ms ease, left 150ms ease, transform 150ms ease;
+}
+
+.tutorial-mini-player::before,
+.tutorial-mini-player span {
+  position: absolute;
+  left: 50%;
+  content: '';
+  transform: translateX(-50%);
+}
+
+.tutorial-mini-player::before {
+  top: 9px;
+  width: 18px;
+  height: 21px;
+  border-radius: 7px 7px 10px 10px;
+  background: linear-gradient(145deg, #ff3f81, #ff8a35);
+  box-shadow: 0 3px 0 #b82d63;
+}
+
+.tutorial-mini-player span {
+  top: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffd36b;
+  box-shadow:
+    0 -5px 0 -2px #6435a5,
+    0 0 0 2px rgba(255, 255, 255, 0.72);
+}
+
+.tutorial-arena-flower {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e3a5ad;
+  box-shadow: 7px 0 #e3a5ad, 3px -5px #e3a5ad, 3px 5px #e3a5ad;
+}
+
+.flower-one { top: 28px; left: 30px; }
+.flower-two { right: 38px; bottom: 26px; }
+
+.tutorial-controls,
+.tutorial-shard-picks {
+  justify-content: center;
+  margin: 10px 0 7px;
+}
+
+.tutorial-controls-wrap {
+  flex-wrap: wrap;
+}
+
+.tutorial-controls button,
+.tutorial-shard-picks button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+}
+
+.tutorial-controls kbd,
+.tutorial-shard-picks kbd {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #e7f1ed;
+  box-shadow: inset 0 -1px 0 rgba(29, 68, 69, 0.18);
+  color: #234d4a;
+  font: inherit;
+  font-weight: 900;
+}
+
+.tutorial-modal button {
+  padding: 8px 11px;
+  border: 1px solid rgba(38, 69, 82, 0.18);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #213d4b;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.tutorial-modal button:hover:not(:disabled),
+.tutorial-modal button:focus-visible {
+  border-color: #4a9d91;
+  outline: 2px solid rgba(74, 157, 145, 0.22);
+}
+
+.tutorial-modal button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.tutorial-combat-scene {
+  display: grid;
+  place-items: center;
+}
+
+.tutorial-practice-block {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+  background: #64b9ae;
+  box-shadow: 0 8px 0 #3b8d86;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.tutorial-practice-block strong {
+  margin-top: 28px;
+  color: #ffffff;
+}
+
+.tutorial-block-eyes {
+  position: absolute;
+  top: 23px;
+  left: 20px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #173d44;
+  box-shadow: 27px 0 #173d44;
+}
+
+.tutorial-practice-block.is-defeated {
+  opacity: 0.28;
+  transform: scale(0.82) rotate(6deg);
+}
+
+.tutorial-combat-scene.did-spin::after {
+  position: absolute;
+  width: 118px;
+  height: 118px;
+  border: 5px solid rgba(217, 166, 65, 0.62);
+  border-radius: 50%;
+  content: '';
+  animation: tutorialSpin 650ms ease-out both;
+}
+
+.tutorial-forge-board {
+  display: grid;
+  grid-template-columns: repeat(5, 34px);
+  justify-content: center;
+  gap: 5px;
+  margin: 12px auto;
+}
+
+.tutorial-forge-cell {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #b9cfc4;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  font-weight: 800;
+}
+
+.tutorial-forge-cell.is-cursor {
+  border-color: #d39a35;
+  box-shadow: 0 0 0 3px rgba(211, 154, 53, 0.22);
+}
+
+.tutorial-weapon-rack {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  min-height: 125px;
+  padding: 22px;
+}
+
+.tutorial-mini-sword {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  color: #52656d;
+  font-size: 0.78rem;
+}
+
+.tutorial-mini-sword i {
+  display: block;
+  width: 11px;
+  height: 70px;
+  border-radius: 7px 7px 3px 3px;
+  background: linear-gradient(90deg, #b8cad1, #ffffff, #94adb7);
+  box-shadow: 0 8px 0 5px #d6a846;
+  transform: rotate(20deg);
+}
+
+.tutorial-weapon-rack.is-merged .tutorial-mini-sword i {
+  width: 14px;
+  height: 82px;
+  background: linear-gradient(90deg, #d5be63, #fff8bf, #b9942f);
+}
+
+@keyframes tutorialSpin {
+  from { opacity: 1; transform: scale(0.45) rotate(0); }
+  to { opacity: 0; transform: scale(1.2) rotate(180deg); }
+}

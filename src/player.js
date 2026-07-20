@@ -48,7 +48,7 @@ export function createPlayer(state) {
     new THREE.BoxGeometry(0.26, 0.18, 0.08),
     trimMaterial
   );
-  beltBuckle.position.set(0, 0.61 + longerLegOffset, 0.64);
+  beltBuckle.position.set(0, 0.61 + longerLegOffset, -0.64);
   group.add(beltBuckle);
 
   const pantsWaist = new THREE.Mesh(

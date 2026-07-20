@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createCraftingBoard, createStarterSword } from './swordcraft.js';
+import { createTutorialState } from './tutorial.js';
 
 const spawnPosition = new THREE.Vector3(0, 1.5, 10);
 const startingHealth = 50;
@@ -78,7 +79,8 @@ export function createGameState() {
       weaponsOpen: false,
       menuOpen: true,
       selectedStickman: null,
-      musicMuted: false
+      musicMuted: false,
+      tutorial: createTutorialState()
     },
     leaderboard: {
       playerName: '',

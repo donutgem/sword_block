@@ -1,7 +1,13 @@
 import { getSelectedHair, hairOptions } from './hair.js';
 import { getSelectedPants, getSelectedTop, pantsOptions, topOptions } from './outfit.js';
-import { getForgePrompt, getForgeState, getSwordBonus, isNearForge } from './progression.js';
+import {
+  getForgePrompt,
+  getForgeState,
+  getSwordBonus,
+  isNearForge
+} from './progression.js';
 import { renderStickmanAnimations } from './stickmen.js';
+import { renderTutorial } from './tutorialView.js';
 import {
   describeSword,
   getAvailableShardCount,
@@ -12,6 +18,7 @@ import {
 let lastHudMarkup = '';
 
 export function renderHud(state) {
+  renderTutorial(state);
   const hud = document.querySelector('#hud');
 
   if (hud.contains(document.activeElement)
@@ -72,12 +79,7 @@ export function renderHud(state) {
           </p>
           <p class="hud-help">C confirms the layout. Backspace removes the last shard.</p>
           <p class="hud-help">${forgeState.craftStatusText}</p>
-          <p class="hud-help">M: Merge the two newest crafted weapons</p>
-          <p class="hud-help">${
-            forgeState.canCombine
-              ? 'Ready to merge.'
-              : 'Need two crafted shard swords.'
-          }</p>
+          <p class="hud-help">M merges the two newest crafted weapons.</p>
           <p class="hud-help">E or Esc: Close forge</p>
         </div>
       `
@@ -303,7 +305,10 @@ function renderOutfitPicker(state) {
       <div class="hud-option-grid">${hairButtons}</div>
     </div>
     <div class="hud-note">Top: ${selectedTop.name} | Pants: ${selectedPants.name} | Hair: ${selectedHair.name}</div>
-    <button class="hud-start-button" type="button" data-action="start-game">Start Game</button>
+    <div class="hud-start-actions">
+      <button class="hud-start-button hud-tutorial-button" type="button" data-tutorial-action="open">Tutorial</button>
+      <button class="hud-start-button" type="button" data-action="start-game">Start Game</button>
+    </div>
     ${renderLeaderboard(state)}
   `;
 }
