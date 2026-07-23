@@ -6,7 +6,7 @@ import {
   getSwordBonus,
   isNearForge
 } from './progression.js';
-import { renderStickmanAnimations } from './stickmen.js';
+import { renderStickmanAnimations, renderStickmanRemote } from './stickmen.js';
 import { renderTutorial } from './tutorialView.js';
 import {
   describeSword,
@@ -16,9 +16,11 @@ import {
 } from './swordcraft.js';
 
 let lastHudMarkup = '';
+let lastRemoteMarkup = '';
 
 export function renderHud(state) {
   renderTutorial(state);
+  renderStickmanRemoteLayer(state);
   const hud = document.querySelector('#hud');
 
   if (hud.contains(document.activeElement)
@@ -141,6 +143,30 @@ export function renderHud(state) {
     hud.innerHTML = fullMarkup;
     lastHudMarkup = fullMarkup;
   }
+}
+
+function renderStickmanRemoteLayer(state) {
+  const root = getStickmanRemoteRoot();
+  const markup = state.mode === 'customize'
+    ? renderStickmanRemote(state)
+    : '';
+
+  if (lastRemoteMarkup !== markup) {
+    root.innerHTML = markup;
+    lastRemoteMarkup = markup;
+  }
+}
+
+function getStickmanRemoteRoot() {
+  let root = document.querySelector('#stickman-remote-root');
+
+  if (!root) {
+    root = document.createElement('div');
+    root.id = 'stickman-remote-root';
+    document.body.append(root);
+  }
+
+  return root;
 }
 
 function renderMusicButton(state) {

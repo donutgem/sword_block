@@ -237,7 +237,7 @@ Do not invent these values. Ask the student for them or use values printed by Qu
 
 ## Limits
 
-- Max 4 players per deployed project version.
+- Max 10 players per deployed project version.
 - Nicknames are required.
 - Rooms are temporary and in-memory.
 - Rooms reset when empty or when the server restarts.

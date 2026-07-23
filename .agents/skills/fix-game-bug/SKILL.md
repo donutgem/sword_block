@@ -16,6 +16,20 @@ also describing broken behavior.
 If the bug report is even a little vague, pause and ask 1 or 2 short multiple
 choice questions before editing code.
 
+For symptom-only bug reports, this is mandatory. Do not inspect files, run
+commands, or edit code until the student clarifies what they mean.
+
+Mandatory-clarification examples:
+- "It doesn't shoot."
+- "I can't see my guy."
+- "The controls don't work."
+- "It is broken."
+- "The camera is weird."
+- "The enemy doesn't do anything."
+
+These reports are not specific enough to fix directly because each one could
+mean several different bugs.
+
 Start by restating what you think the student means in clear, direct language:
 
 ```txt
@@ -33,8 +47,26 @@ C. The player faces the wrong way but moves correctly
 D. Something else
 ```
 
-Only ask what you need. If the bug is already clear and low-risk, restate your
-understanding and fix it directly.
+Only ask what you need. If the student's first message is symptom-only, do not
+decide that the bug is "clear enough" on your own.
+
+You may fix directly only when the report includes the expected behavior, the
+actual behavior, and enough concrete detail to identify the likely broken part.
+Examples:
+- "When I press Space, the bullet spawns behind the player instead of in front."
+- "The player should jump with W, but W currently moves forward."
+- "The score should increase by 1 when a bullet hits an enemy, but it stays 0."
+
+For "it doesn't shoot", ask something like:
+
+```txt
+Got it. I think you mean pressing the shoot button is not making the weapon work.
+Which one is happening?
+A. No bullet or projectile appears at all
+B. A bullet appears, but in the wrong place or direction
+C. A bullet appears, but it does not hit enemies
+D. I am not sure what key or button should shoot
+```
 
 ## Good Clarifying Questions
 
@@ -60,7 +92,8 @@ D. Score, timer, or UI
 ## Bug-Fix Workflow
 
 1. Decide whether this is a bug fix or a new feature.
-2. If the report is vague, ask 1 or 2 A/B/C/D questions.
+2. If the report is vague or symptom-only, ask 1 or 2 A/B/C/D questions before
+   inspecting files or editing.
 3. Restate the bug clearly before editing.
 4. Inspect the smallest relevant files first.
 5. Change the smallest piece of code that explains the behavior.
@@ -120,6 +153,7 @@ For placement and anchoring:
 
 - Do not guess from vague words like "broken" without asking a clarifying
   question.
+- Do not treat "it doesn't shoot" as enough information to start coding.
 - Do not add a new feature when the student asked for a fix.
 - Do not remap keys to hide inverted movement math.
 - Do not scatter random position offsets across files.

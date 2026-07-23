@@ -67,6 +67,11 @@ Prefer:
 
 Only use GLTF models when the user explicitly asks for models or the lesson is about model loading.
 
+For important characters, vehicles, enemies, buildings, props, and landmarks,
+do not leave random placeholder shapes unless the user asked for placeholders.
+Use the model builder skill to create intentional grouped primitive models with
+a readable silhouette.
+
 ## Beginner-First Communication
 
 When responding to the user:
@@ -79,6 +84,18 @@ When responding to the user:
 If a choice is required:
 - Offer 2 or 3 options.
 - Recommend one clearly.
+
+## Clarify Unclear Requests First
+
+Use `.agents/skills/clarify-request/SKILL.md` when the user's message is short,
+vague, or could mean several different things.
+
+For vague bug reports, use `.agents/skills/fix-game-bug/SKILL.md` instead. For
+vague new projects or big features, use `.agents/skills/project-planner/SKILL.md`
+instead.
+
+Do not inspect files, run commands, or edit code until the unclear request has
+been clarified.
 
 ## Planning Rule
 
@@ -139,12 +156,71 @@ Three.js game. That skill owns scene defaults, renderer defaults,
 surface placement, animation-loop rules, performance guardrails, and state
 management safety.
 
+## Model Builder Rule
+
+Use `.agents/skills/model-builder/SKILL.md` when the user asks to make,
+improve, redesign, polish, edit, inspect, view, or tweak a 3D model,
+primitive model, player, enemy, vehicle, building, prop, collectible, weapon,
+tree, obstacle, landmark, or model workshop.
+
+If the user says `open the Model Workshop`, `make a Model Workshop`, `show me
+the Model Workshop`, or similar, they mean: create or open a temporary 3D model
+viewer/editor for the project's models. The workshop should let them view one
+model at a time, rotate/zoom around it, click individual primitive pieces, edit
+the selected piece in a left-side panel, and copy the values for their AI.
+
+If the model is in a Three.js game, also use `.agents/skills/threejs-game/SKILL.md`.
+
+## Game Controls Rule
+
+Use `.agents/skills/game-controls/SKILL.md` when building, changing, or
+debugging player controls, camera controls, first-person movement,
+third-person movement, driving controls, flying controls, shooter controls,
+pointer lock, mouse-look, WASD movement, steering, or direction bugs.
+
+If the game is a Three.js game, also use `.agents/skills/threejs-game/SKILL.md`.
+
+## Visual Check Rule
+
+Use `.agents/skills/visual-check/SKILL.md` when deciding whether to take
+screenshots, use Playwright or browser automation, open a browser, or do a
+quick visual verification pass after frontend, canvas, Three.js, layout,
+camera, visibility, orientation, or framing changes.
+
+The visual check should answer first-impression questions:
+- Can you see the important thing?
+- Is the camera pointed at it?
+- Is it facing the expected direction?
+- Is the UI readable and not overlapping?
+
+Keep browser automation small. Do not turn visual checks into exhaustive
+Playwright scripts, smoke-test suites, or long gameplay recordings.
+
+If project instructions say not to use Playwright, do not use Playwright.
+
+## Tuner Rule
+
+Use `.agents/skills/tuner/SKILL.md` when the user asks for a tuner,
+tuning panel, adjustment UI, debug controls, calibration controls, or
+on-screen controls to move, rotate, scale, position, size, aim, or fine-tune
+a game object, camera, light, spawn point, hitbox, level part, model, or
+gameplay value.
+
 ## Quest Agent Docs Update Rule
 
 If the user asks to update Quest docs, agent docs, AI instructions, Codex instructions, `AGENTS.md`, or Quest skills:
 - Download and run `https://app.joinquest.com/student-deploy/update-quest-agent-docs.mjs`.
 - Run it from the project root.
 - After it runs, tell the user exactly which files changed.
+
+## Quest Agent Docs Freshness Rule
+
+When you first start meaningful work in a project, check `.agents/quest-agent-docs.json`.
+- If the file is missing, unreadable, or `lastUpdatedAt` is 7 or more days old, download and run `https://app.joinquest.com/student-deploy/update-quest-agent-docs.mjs`.
+- Run it from the project root.
+- After it runs, re-read `AGENTS.md` before continuing.
+- Do not block on this if the network is unavailable; mention the update check failed and continue with the installed docs.
+- Do not run the updater repeatedly in the same task after a successful refresh.
 
 Example command:
 
@@ -154,57 +230,32 @@ curl -fsSL https://app.joinquest.com/student-deploy/update-quest-agent-docs.mjs 
 
 ## Multiplayer Rule
 
-If the user asks for multiplayer, networking, rooms, syncing players, shared world state, live game sessions, or anything similar, do not build a custom multiplayer backend by default.
-
-- Do not create an Express server.
-- Do not create a Socket.IO server.
-- Do not create a Colyseus server.
-- Do not create a custom WebSocket backend.
-- Do not add a separate hosted multiplayer service.
-
-Use the Quest Multiplayer SDK instead:
-- Read `.agents/skills/make-game-multiplayer/SKILL.md` if it exists.
-- If it does not exist, read https://agents.joinquest.com/skills/make-game-multiplayer/SKILL.md.
-- Use the SDK guide at https://agents.joinquest.com/docs/multiplayer-sdk.md when more detail is needed.
-
-Important:
-- Quest deployments must remain static browser builds.
-- Multiplayer must use the Quest Multiplayer SDK.
-- Keep game logic client-side.
-- Use presence for player-specific temporary state.
-- Use shared state for room-wide state late joiners should receive.
-- Use events for temporary one-off actions.
+If the user asks for multiplayer, networking, rooms, syncing players, shared
+world state, live game sessions, or anything similar:
+- Use `.agents/skills/make-game-multiplayer/SKILL.md`.
+- Do not build a custom multiplayer backend for Quest Student Deploy.
+- Keep the deployed project as static browser files.
 
 ## Deploy Rule For Projects
 
 If the user asks to deploy a game to Quest:
-- Read `.agents/skills/deploy-game/SKILL.md` if it exists.
-- If it does not exist, read https://agents.joinquest.com/skills/deploy-game/SKILL.md.
-- Look for the Quest deploy token in the user's message first.
-- If no token is in the message, check `.env.local` in the project root for `QUEST_DEPLOY_TOKEN` or `STUDENT_DEPLOY_TOKEN`.
-- If no local token is available, check the shell environment for `QUEST_DEPLOY_TOKEN` or `STUDENT_DEPLOY_TOKEN`.
-- If the user provides a token, save it to `.env.local` as `QUEST_DEPLOY_TOKEN=<exact token>` and make sure `.gitignore` contains `.env.local` or `.env*.local`.
-- Ask only for the user's Quest deploy token if it is not available from the message, `.env.local`, or shell environment.
-- Choose the macOS/Linux or Windows PowerShell deploy command automatically based on the current shell.
-- The token is the only project identifier for deploys. Do not add, infer, fix, or validate a project slug from the repo, folder, package, or command.
-- Old owner-wide deploy tokens are no longer valid; if the API says the token is outdated or expired, ask for the latest project deploy token.
-- If the user provides an older full Quest deploy prompt or command, use it and preserve build-related arguments such as `--entry`, `--dir`, `--build-dir`, and `--no-build`.
-- Run only one deploy command at a time. If the command is still running, wait for it to finish; do not start another deploy in parallel or because output is taking a while.
-- Run the deploy command once. If it prints `QUEST_DEPLOY_RESULT {"status":"success",...}`, do not rerun the command, even if later source-backup output is slow, noisy, or warning-only.
-- Do not invent deploy tokens, placeholder versions, or URLs.
-- Treat the structured `QUEST_DEPLOY_RESULT` line as the source of truth.
+- Use `.agents/skills/deploy-game/SKILL.md`.
+- Follow that skill exactly for token handling, commands, release metadata, and
+  final response format.
+- Do not deploy a custom backend.
+
+## Edit Deployed Version Or Changelog Rule
+
+If the user asks to edit, rename, polish, write, or fix a deployed version label or changelog:
+- Use `.agents/skills/edit-version-changelog/SKILL.md`.
+- Do not redeploy the game just to edit a release label or changelog.
+- Leave the version label unchanged unless the user explicitly asks to rename or relabel the version.
 
 ## Delete Deployed Version Rule
 
 If the user asks to delete, remove, clean up, or undo a published Quest Student Deploy game version:
-- Read `.agents/skills/delete-game-version/SKILL.md` if it exists.
-- If it does not exist, read https://agents.joinquest.com/skills/delete-game-version/SKILL.md.
-- List the student's projects and versions using the Quest deploy token.
-- Ask which project/version to delete if it is not already clear.
-- Show the exact version link before deleting.
-- Ask for clear yes/no confirmation before deleting and state that deletion cannot be undone.
-- If there are higher versions than the one being deleted, explain that Quest compacts version numbering after deletion: any later versions shift down by one number, so if v1, v2, and v3 exist and v2 is deleted, the old v3 becomes the new v2.
-- After a successful deletion, mention following versions were renumbered down by one only if there were higher versions than the one deleted.
+- Use `.agents/skills/delete-game-version/SKILL.md`.
+- Show the exact version link and get clear yes/no confirmation before deleting.
 - Do not delete if the answer is unclear or anything other than yes.
 
 ## Local Storage Rule
@@ -212,27 +263,19 @@ If the user asks to delete, remove, clean up, or undo a published Quest Student 
 If the user asks for saved progress, high scores, settings, save slots,
 `localStorage`, `sessionStorage`, or storage that works locally but fails after
 Quest deploy:
-- Read `.agents/skills/use-local-storage/SKILL.md` if it exists.
-- If it does not exist, read https://agents.joinquest.com/skills/use-local-storage/SKILL.md.
+- Use `.agents/skills/use-local-storage/SKILL.md`.
 - Keep saves client-side and small.
-- Use simple `localStorage` or `sessionStorage` patterns.
 - Do not add a backend just to save game state.
-- Do not rely on IndexedDB, localForage, service-worker storage, or Web Worker
-  storage unless Quest explicitly documents support.
 
 ## Leaderboard Rule
 
 If the user asks for an online leaderboard, shared high scores, global scores,
 persistent score database, fastest-time board, points ranking, money ranking,
 or scores shared across devices:
-- Read `.agents/skills/use-leaderboard/SKILL.md` if it exists.
-- If it does not exist, read https://agents.joinquest.com/skills/use-leaderboard/SKILL.md.
-- Use the SDK guide at https://agents.joinquest.com/docs/leaderboard-sdk.md when more detail is needed.
-- Use the Quest Leaderboard SDK from `/student-deploy/quest-leaderboard.mjs` or `.js`.
+- Use `.agents/skills/use-leaderboard/SKILL.md`.
+- Use the Quest Leaderboard SDK.
 - Do not create a custom backend, database, Supabase project, Firebase project,
   or put database credentials in browser code.
-- Submit scores only at round end, level completion, or when the player beats a best score.
-- Use `order: "desc"` when higher scores are better and `order: "asc"` when lower scores are better.
 
 ## Anti-Patterns
 

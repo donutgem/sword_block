@@ -4,7 +4,6 @@ import {
   drawForgeStation,
   drawImpactLines,
   drawIntermission,
-  drawJumpArc,
   drawShard,
   drawSpark,
   drawStickman,
@@ -20,7 +19,11 @@ const FRAME_COUNTS = {
   race: 14,
   jump: 14,
   duel: 12,
-  forge: 18
+  forge: 18,
+  cheer: 12,
+  throw: 14,
+  staff: 14,
+  dance: 16
 };
 export function syncStickmanMovies(root) {
   root.querySelectorAll('[data-stickman-canvas="true"]').forEach((canvas) => {
@@ -89,6 +92,14 @@ function drawScene(context, canvas, storyId, color, frame) {
     drawJump(context, frame, groundY, scale);
   } else if (storyId === 'duel') {
     drawDuel(context, frame, groundY, scale);
+  } else if (storyId === 'cheer') {
+    drawCheer(context, frame, groundY, scale);
+  } else if (storyId === 'throw') {
+    drawThrow(context, frame, groundY, scale);
+  } else if (storyId === 'staff') {
+    drawStaffSpin(context, frame, groundY, scale);
+  } else if (storyId === 'dance') {
+    drawDance(context, frame, groundY, scale);
   } else {
     drawForge(context, frame, groundY, scale, color);
   }
@@ -117,11 +128,31 @@ function drawJump(context, frame, groundY, scale) {
   const heights = [0, 0, 6, 16, 27, 34, 32, 24, 12, 3, 0, 0, 4, 0];
   const xSteps = [18, 24, 33, 45, 58, 70, 82, 94, 105, 114, 121, 124, 126, 128];
   const pose = jumpPose(frame);
+  const jumperX = sampleLoop(xSteps, frame) * scale;
+  const jumperY = groundY - sampleLoop(heights, frame) * scale;
 
-  drawJumpArc(context, 20 * scale, 126 * scale, groundY, scale);
+  drawJumpTrail(context, frame, xSteps, heights, groundY, scale);
   drawBlock(context, 82 * scale, groundY, scale);
-  drawStickman(context, sampleLoop(xSteps, frame) * scale, groundY - sampleLoop(heights, frame) * scale, '#b88400', pose, scale);
+  drawStickman(context, jumperX, jumperY, '#b88400', pose, scale);
   drawStickman(context, 126 * scale, groundY, '#0b8a8f', cheerPose(frame), scale * 0.8);
+}
+
+function drawJumpTrail(context, frame, xSteps, heights, groundY, scale) {
+  const currentStep = Math.floor(frame);
+  const dotCount = Math.min(currentStep + 1, xSteps.length);
+
+  context.fillStyle = 'rgba(184, 132, 0, 0.42)';
+
+  for (let index = 0; index < dotCount; index += 1) {
+    const trailAge = dotCount - index;
+    const radius = Math.max(1.5, 4 - trailAge * 0.18) * scale;
+    const x = xSteps[index] * scale;
+    const y = groundY - heights[index] * scale - 5 * scale;
+
+    context.beginPath();
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.fill();
+  }
 }
 
 function drawDuel(context, frame, groundY, scale) {
@@ -201,6 +232,75 @@ function drawForge(context, frame, groundY, scale, color) {
   drawStickman(context, 120 * scale, groundY, '#b88400', helperPose, scale * 0.82);
 }
 
+function drawCheer(context, frame, groundY, scale) {
+  const bounce = Math.sin(frame * 1.2) * 5;
+  drawSpark(context, 75 * scale, groundY - 58 * scale, scale, frame);
+  drawStickman(context, 75 * scale, groundY - bounce * scale, '#0b8a8f', cheerPose(frame), scale);
+  drawStickman(context, 112 * scale, groundY, '#238a50', {
+    leftArm: 1.7,
+    rightArm: -1.4,
+    leftLeg: 0.35,
+    rightLeg: -0.35,
+    lean: -0.14
+  }, scale * 0.82);
+}
+
+function drawThrow(context, frame, groundY, scale) {
+  const step = frame % FRAME_COUNTS.throw;
+  const progress = Math.min(Math.max((step - 4) / 7, 0), 1);
+  const starX = (54 + progress * 74) * scale;
+  const starY = (groundY - (48 - Math.sin(progress * Math.PI) * 18) * scale);
+  const pose = {
+    leftArm: 0.7,
+    rightArm: sampleLoop([-1.5, -1.9, -2.15, -1.2, 0.1, 0.75, 0.2], frame),
+    leftLeg: 0.35,
+    rightLeg: -0.42,
+    lean: progress > 0 ? 0.25 : -0.08
+  };
+
+  drawBlock(context, 125 * scale, groundY, scale);
+  drawStickman(context, 46 * scale, groundY, '#2778d8', pose, scale);
+  drawNinjaStar(context, starX, starY, frame, scale);
+
+  if (progress > 0.82) {
+    drawImpactLines(context, 126 * scale, groundY - 18 * scale, scale);
+  }
+}
+
+function drawStaffSpin(context, frame, groundY, scale) {
+  const pose = {
+    leftArm: 1.75,
+    rightArm: -1.75,
+    leftLeg: 0.34,
+    rightLeg: -0.34,
+    lean: Math.sin(frame * 0.7) * 0.18
+  };
+  const hand = getStickmanHand(75 * scale, groundY, pose, pose.rightArm, scale);
+  const angle = -frame * 0.75;
+
+  drawBlock(context, 116 * scale, groundY, scale);
+  drawStickman(context, 75 * scale, groundY, '#7f6758', pose, scale);
+  drawSword(context, hand.x, hand.y - 10 * scale, 43 * scale, angle, scale);
+  drawSword(context, hand.x, hand.y - 10 * scale, 43 * scale, angle + Math.PI, scale);
+
+  if (Math.floor(frame) % 5 === 2) {
+    drawImpactLines(context, 116 * scale, groundY - 18 * scale, scale);
+  }
+}
+
+function drawDance(context, frame, groundY, scale) {
+  const poses = [
+    { leftArm: 1.8, rightArm: -0.5, leftLeg: 0.8, rightLeg: -0.25, lean: -0.22 },
+    { leftArm: 1.2, rightArm: -1.2, leftLeg: 0.25, rightLeg: -0.25, lean: 0 },
+    { leftArm: 0.5, rightArm: -1.8, leftLeg: 0.25, rightLeg: -0.8, lean: 0.22 },
+    { leftArm: 1.2, rightArm: -1.2, leftLeg: 0.25, rightLeg: -0.25, lean: 0 }
+  ];
+
+  drawStickman(context, 55 * scale, groundY, '#c03a82', samplePoseLoop(poses, frame), scale);
+  drawStickman(context, 98 * scale, groundY, '#d46b1f', samplePoseLoop(poses, frame + 2), scale * 0.9);
+  drawFrameTicks(context, frame, 20 * scale, groundY - 56 * scale, scale);
+}
+
 function wrappedX(frame, speed, offset) {
   return 10 + ((frame * speed + offset) % 112);
 }
@@ -213,6 +313,25 @@ function drawRunner(context, x, groundY, color, frame, scale) {
     { leftArm: -0.25, rightArm: 0.25, leftLeg: 0.3, rightLeg: -0.3 }
   ];
   drawStickman(context, x, groundY, color, { ...samplePoseLoop(poses, frame), lean: 0.22 }, scale);
+}
+
+function drawNinjaStar(context, x, y, frame, scale) {
+  context.save();
+  context.translate(x, y);
+  context.rotate(frame * 0.8);
+  context.strokeStyle = '#263445';
+  context.lineWidth = 2 * scale;
+  for (let index = 0; index < 4; index += 1) {
+    const angle = (Math.PI / 4) * index;
+    line(
+      context,
+      Math.cos(angle) * -7 * scale,
+      Math.sin(angle) * -7 * scale,
+      Math.cos(angle) * 7 * scale,
+      Math.sin(angle) * 7 * scale
+    );
+  }
+  context.restore();
 }
 
 function jumpPose(frame) {

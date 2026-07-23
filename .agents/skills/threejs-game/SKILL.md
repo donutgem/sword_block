@@ -35,6 +35,18 @@ Three.js reference frame:
 If movement feels backward, fix the vector math. Do not remap keys to hide an
 orientation bug.
 
+For any moving character, enemy, vehicle, projectile, or aircraft, confirm the
+visual model faces the intended movement direction. Imported models often have a
+different local forward axis than the movement code assumes. If the art faces
+backward, sideways, or downward, wrap the mesh in a parent `Object3D`, rotate the
+mesh once during setup, and move the parent.
+
+For custom moving models, add temporary direction markers while building:
+`frontMarker`, `backMarker`, `leftMarker`, `rightMarker`, `upMarker`, and
+`downMarker`. Use small dots, spheres, or labels to make the model's local axes
+obvious before wiring controls. Remove these markers before final delivery
+unless the user wants debug helpers.
+
 ## Camera-Relative Movement
 
 When using WASD with a movable camera:

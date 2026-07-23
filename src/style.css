@@ -272,16 +272,47 @@ canvas {
 
 .stickman-showcase {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.stickman-menu {
   margin-top: 8px;
+}
+
+.stickman-remote {
+  position: fixed;
+  top: 12px;
+  left: min(388px, calc(100vw - 150px));
+  width: 138px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 8px;
+  border: 2px solid #27313d;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #15191f 0%, #050608 100%);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.34);
+  color: #eef8ff;
+}
+
+.stickman-remote-header {
+  padding: 4px 5px 7px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: #b8e5ff;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .stickman-card {
   display: grid;
   justify-items: center;
   min-width: 0;
-  padding: 8px 6px;
+  padding: 5px 4px;
   border: 1px solid rgba(20, 33, 46, 0.1);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.7);
@@ -289,6 +320,26 @@ canvas {
   cursor: pointer;
   font: inherit;
   text-align: center;
+}
+
+.stickman-remote .stickman-card {
+  min-height: 34px;
+  border-color: rgba(184, 229, 255, 0.24);
+  border-radius: 999px;
+  background: radial-gradient(circle at top, #2c3642 0%, #11161d 100%);
+  color: #eef8ff;
+}
+
+.stickman-remote .stickman-caption {
+  color: #eef8ff;
+  font-size: 0.52rem;
+}
+
+.stickman-remote .stickman-watch-label {
+  padding: 1px 3px;
+  background: rgba(123, 212, 255, 0.16);
+  color: #9fe0ff;
+  font-size: 0.44rem;
 }
 
 .stickman-canvas {
@@ -306,10 +357,18 @@ canvas {
 }
 
 .stickman-card:hover,
-.stickman-card:focus-visible {
+.stickman-card:focus-visible,
+.stickman-card.is-selected {
   border-color: #398ac6;
   box-shadow: 0 0 0 2px rgba(57, 138, 198, 0.18);
   outline: none;
+}
+
+.stickman-remote .stickman-card:hover,
+.stickman-remote .stickman-card:focus-visible,
+.stickman-remote .stickman-card.is-selected {
+  border-color: #7bd4ff;
+  box-shadow: 0 0 0 2px rgba(123, 212, 255, 0.22);
 }
 
 .stickman-stage {
@@ -415,16 +474,16 @@ canvas {
 
 .stickman-story {
   display: grid;
-  gap: 2px;
+  gap: 3px;
   width: 100%;
   min-height: 34px;
-  align-content: start;
+  align-content: center;
 }
 
 .stickman-speech {
   display: block;
   color: #314555;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   line-height: 1.15;
   text-align: center;
@@ -436,7 +495,7 @@ canvas {
   width: max-content;
   max-width: 100%;
   margin: 0 auto;
-  padding: 2px 6px;
+  padding: 1px 3px;
   border-radius: 999px;
   background: rgba(57, 138, 198, 0.14);
   color: #286d9f;
@@ -1176,4 +1235,13 @@ canvas {
 .craft-cell.is-cursor {
   border-color: #398ac6;
   box-shadow: 0 0 0 2px rgba(57, 138, 198, 0.22);
+}
+
+@media (max-width: 540px) {
+  .stickman-remote {
+    position: static;
+    width: 100%;
+    max-height: 210px;
+    margin-top: 8px;
+  }
 }
