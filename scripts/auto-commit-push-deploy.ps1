@@ -44,7 +44,20 @@ git push origin $branch
 
 Write-Log "Deploying to Quest."
 $env:NODE_OPTIONS = (($env:NODE_OPTIONS + " --use-system-ca").Trim())
-(Invoke-WebRequest "https://app.joinquest.com/student-deploy/runner.js" -UseBasicParsing).Content |
-  node - --api-base "https://app.joinquest.com"
+$deployOutput = (Invoke-WebRequest "https://app.joinquest.com/student-deploy/runner.js" -UseBasicParsing).Content |
+  node - --api-base "https://app.joinquest.com" 2>&1
+
+$deployOutput | Tee-Object -FilePath $logPath -Append
+
+$resultLine = $deployOutput | Where-Object { $_ -like "QUEST_DEPLOY_RESULT *" } | Select-Object -Last 1
+if ($resultLine -and $resultLine -like '*"status":"failed"*') {
+  Write-Log "Quest deploy failed."
+  exit 1
+}
+
+if (-not $resultLine) {
+  Write-Log "Quest deploy did not print a structured result."
+  exit 1
+}
 
 Write-Log "Finished."
