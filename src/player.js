@@ -18,10 +18,10 @@ export function createPlayer(state) {
   group.name = 'player';
 
   const accentMaterial = new THREE.MeshStandardMaterial({ color: '#fff6d6' });
-  const clothMaterial = new THREE.MeshStandardMaterial({ color: '#8f4a58' });
-  const trimMaterial = new THREE.MeshStandardMaterial({ color: '#efc36b' });
-  const pantsMaterial = new THREE.MeshStandardMaterial({ color: '#344f6d' });
-  const darkMaterial = new THREE.MeshStandardMaterial({ color: '#233645' });
+  const clothMaterial = new THREE.MeshStandardMaterial({ color: '#e64968' });
+  const trimMaterial = new THREE.MeshStandardMaterial({ color: '#ffd447' });
+  const pantsMaterial = new THREE.MeshStandardMaterial({ color: '#285cb8' });
+  const darkMaterial = new THREE.MeshStandardMaterial({ color: '#172d46' });
 
   const torso = new THREE.Mesh(
     new THREE.CylinderGeometry(0.58, 0.62, 1.38, 12),

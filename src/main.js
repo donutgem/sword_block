@@ -236,7 +236,7 @@ renderer.setAnimationLoop((time) => {
 
   updatePickups(state, scene, delta, elapsedTime);
   syncSwordLevel(state);
-  updateEnemyVisuals(state, delta, elapsedTime);
+  updateEnemyVisuals(state, camera, delta, elapsedTime);
 
   if (allEnemiesDefeated(state)) {
     submitWaveScore(state);

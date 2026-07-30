@@ -88,6 +88,11 @@
   line-height: 1.4;
 }
 
+.tutorial-points-compact {
+  gap: 6px;
+  margin: 10px 0 14px;
+}
+
 .tutorial-next-up,
 .tutorial-status {
   padding: 10px 12px;

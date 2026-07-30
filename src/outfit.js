@@ -1,19 +1,19 @@
 import { setMessage } from './state.js';
 
 export const topOptions = [
-  { name: 'Crimson Tunic', primary: '#8f4a58', trim: '#efc36b', shape: 'balanced' },
-  { name: 'Forest Jacket', primary: '#4b7655', trim: '#d9eb9d', shape: 'wide' },
-  { name: 'Royal Guard', primary: '#445f9d', trim: '#f2d37a', shape: 'armored' },
-  { name: 'Sun Scout', primary: '#b86d3f', trim: '#f3e5a1', shape: 'slim' },
-  { name: 'Shadow Vest', primary: '#5c476e', trim: '#cfb8f0', shape: 'narrow' }
+  { name: 'Crimson Tunic', primary: '#e64968', trim: '#ffd447', shape: 'balanced' },
+  { name: 'Forest Jacket', primary: '#28a85b', trim: '#d7ff66', shape: 'wide' },
+  { name: 'Royal Guard', primary: '#4169e8', trim: '#ffe05c', shape: 'armored' },
+  { name: 'Sun Scout', primary: '#f27732', trim: '#fff078', shape: 'slim' },
+  { name: 'Shadow Vest', primary: '#874fd1', trim: '#e7b8ff', shape: 'narrow' }
 ];
 
 export const pantsOptions = [
-  { name: 'Navy Pants', color: '#344f6d', fit: 1 },
-  { name: 'Moss Pants', color: '#536c4e', fit: 1.12 },
-  { name: 'Stone Pants', color: '#6a6670', fit: 1.22 },
-  { name: 'Sand Pants', color: '#90734f', fit: 0.92 },
-  { name: 'Berry Pants', color: '#70455a', fit: 1.05 }
+  { name: 'Navy Pants', color: '#285cb8', fit: 1 },
+  { name: 'Moss Pants', color: '#4b8f42', fit: 1.12 },
+  { name: 'Stone Pants', color: '#6961a8', fit: 1.22 },
+  { name: 'Sand Pants', color: '#c18035', fit: 0.92 },
+  { name: 'Berry Pants', color: '#a83f72', fit: 1.05 }
 ];
 
 const topShapes = {

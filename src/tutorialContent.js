@@ -1,67 +1,61 @@
 export const tutorialSteps = [
   {
-    kind: 'lesson',
-    title: 'Move with confidence',
-    text: 'You face the direction you are moving. The camera follows behind you.',
+    kind: 'practice',
+    practice: 'movement',
+    title: 'Move',
+    text: 'The camera follows behind while you move in the direction you face.',
     points: [
       'J turns left and L turns right.',
       'K moves forward in the direction you face.',
       'Keep moving when blocks crowd around you.'
     ]
   },
-  { kind: 'practice', practice: 'movement', title: 'Try moving' },
   {
-    kind: 'lesson',
+    kind: 'practice',
+    practice: 'combat',
     title: 'Fight and survive',
     text: 'Defeat every block to clear the wave and start a stronger one.',
     points: [
       'Space uses your normal attack.',
-      'The Spin Attack button hits around you. Its timer counts down while it recharges.',
-      'When the timer reaches 0, Spin Attack is ready again. Most weapons take 5 seconds; Ninja Stars take 8.',
-      'Touching blocks costs health. At zero health, you respawn at the gate.',
-      'A new wave restores your health and raises your maximum health.'
+      'Spin Attack hits around you. Most spin timers take 5 seconds; Ninja Stars take 8.',
+      'Touching blocks costs health. At zero you respawn; a new wave restores health and raises its maximum.'
     ]
   },
-  { kind: 'practice', practice: 'combat', title: 'Try attacking' },
   {
-    kind: 'lesson',
+    kind: 'practice',
+    practice: 'forge',
     title: 'Collect shards and forge',
     text: 'Defeated blocks raise your level and drop blade, guard, or pommel shards.',
     points: [
-      'Walk over a shard to collect it.',
-      'Stand in the glowing forge ring and press E.',
-      'Use 1, 2, or 3 to choose a shard. Move with WASD and place with Enter or Space.',
-      'Backspace removes the last shard. C forms the weapon.',
+      'Walk over shards to collect them. In the glowing forge ring, press E.',
+      'Choose with 1/2/3, move with WASD, place with Enter, undo with Backspace, and forge with C.',
       'E or Escape closes the forge.',
       'Before level 15, a weapon needs all three shard types. Smaller mixes unlock at level 15.'
     ]
   },
-  { kind: 'practice', practice: 'forge', title: 'Try the forge' },
   {
-    kind: 'lesson',
+    kind: 'practice',
+    practice: 'advanced',
     title: 'Level 15 opens new builds',
     text: 'At level 15, the forge accepts layouts with only one or two shard types.',
     points: [
-      'Blade shards alone make a Ninja Star. Space throws it forward.',
-      'Ninja Star Spin Attack throws stars in every direction and takes 8 seconds to recharge.',
+      'Blade-only makes a Ninja Star; its Spin Attack throws stars around you and takes 8 seconds.',
       'Guard shards alone make a Staff with a longer close-range sweep.',
       'Pommel shards alone make Weighted Balls that can be thrown forward.',
       'Any two shard types make a hybrid weapon that mixes those parts and their stats.'
     ]
   },
-  { kind: 'practice', practice: 'advanced', title: 'Explore level 15 weapons' },
   {
-    kind: 'lesson',
+    kind: 'practice',
+    practice: 'merge',
     title: 'Manage stronger weapons',
     text: 'Crafted weapons are stronger than the starter sword and are equipped right away.',
     points: [
       'Show Weapons lets you inspect reach and damage, then equip a weapon.',
-      'At the forge, M merges the two newest crafted weapons.',
-      'A merge combines their power and adds a 10% bonus.',
+      'At the forge, M merges the two newest weapons and adds a 10% power bonus.',
       'Enter your name on the opening screen. Cleared waves submit your block score.'
     ]
   },
-  { kind: 'practice', practice: 'merge', title: 'Try merging' },
   {
     kind: 'lesson',
     title: 'Ready for the arena',
@@ -69,7 +63,7 @@ export const tutorialSteps = [
     points: [
       'Turn with J/L, move with K, and attack with Space.',
       'Collect drops, visit the forge with E, and keep improving your weapon.',
-      'You can close this tutorial now or review any earlier lesson.'
+      'You can finish now or use Back to review any step.'
     ]
   }
 ];

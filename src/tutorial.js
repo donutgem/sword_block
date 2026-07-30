@@ -27,7 +27,8 @@ export function isTutorialPracticeComplete(state) {
 
   if (step.practice === 'combat') {
     const combat = state.ui.tutorial.combat;
-    return combat.normalHits >= 2 && combat.spinHits >= 1 && combat.timerSeen;
+    const damageDealt = combat.normalHits + combat.spinHits * 2;
+    return damageDealt >= 4;
   }
 
   if (step.practice === 'forge') {

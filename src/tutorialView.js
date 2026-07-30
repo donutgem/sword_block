@@ -59,7 +59,6 @@ function renderLesson(step) {
   return `
     <p class="tutorial-lead">${step.text}</p>
     <ul class="tutorial-points">${points}</ul>
-    <div class="tutorial-next-up">Next: a small practice simulator.</div>
   `;
 }
 
@@ -75,6 +74,7 @@ function renderPractice(state, step) {
   const complete = isTutorialPracticeComplete(state);
 
   return `
+    ${renderPracticeSummary(step)}
     <div class="tutorial-simulator">
       ${renderer ? renderer(state.ui.tutorial) : ''}
     </div>
@@ -84,11 +84,20 @@ function renderPractice(state, step) {
   `;
 }
 
+function renderPracticeSummary(step) {
+  const points = step.points.map((point) => `<li>${point}</li>`).join('');
+
+  return `
+    <p class="tutorial-lead">${step.text}</p>
+    <ul class="tutorial-points tutorial-points-compact">${points}</ul>
+  `;
+}
+
 function renderMovementPractice(tutorial) {
   const practice = tutorial.movement;
 
   return `
-    <p>Turn at least once, then move forward three times.</p>
+    <p>Try J or L once, then press K three times.</p>
     <div class="tutorial-mini-arena">
       <div
         class="tutorial-mini-player"
@@ -113,7 +122,7 @@ function renderCombatPractice(tutorial) {
   const cooldownLabel = cooldown > 0 ? `${cooldown.toFixed(1)} seconds` : 'Ready';
 
   return `
-    <p>Hit the practice block twice, then use Spin Attack and watch its timer.</p>
+    <p>Destroy the block with any mix of Space and Spin Attack.</p>
     <div class="tutorial-combat-scene ${practice.spinHits > 0 ? 'did-spin' : ''}">
       <div class="tutorial-practice-block ${targetHealth === 0 ? 'is-defeated' : ''}">
         <span class="tutorial-block-eyes"></span>

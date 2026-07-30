@@ -25,6 +25,13 @@
   overflow: hidden;
   border: 1px solid #bdd5c5;
   border-radius: 16px;
+}
+
+.tutorial-mini-arena {
+  background: linear-gradient(145deg, #eaf8e2, #dff3ee);
+}
+
+.tutorial-combat-scene {
   background:
     linear-gradient(rgba(129, 174, 148, 0.12) 1px, transparent 1px),
     linear-gradient(90deg, rgba(129, 174, 148, 0.12) 1px, transparent 1px),
@@ -126,6 +133,13 @@
 .tutorial-modal button:focus-visible {
   border-color: #4a9d91;
   outline: 2px solid rgba(74, 157, 145, 0.22);
+}
+
+.tutorial-controls button[data-tutorial-key="Spin"] {
+  border-color: #ff4f8d;
+  background: linear-gradient(135deg, #ff3f81, #ff8a35);
+  box-shadow: 0 7px 18px rgba(255, 63, 129, 0.24);
+  color: #ffffff;
 }
 
 .tutorial-modal button:disabled {
