@@ -55,7 +55,9 @@ export function renderHud(state) {
     const healthRatio = state.player.maxHealth > 0
       ? state.player.health / state.player.maxHealth
       : 0;
-    const healthPercent = Math.max(healthRatio, 0) * 100;
+    const clampedHealthRatio = Math.min(Math.max(healthRatio, 0), 1);
+    const healthPercent = clampedHealthRatio * 100;
+    const healthHue = Math.round(clampedHealthRatio * 120);
 
     const equippedSword = getEquippedSword(state);
     const weaponSwitcher = renderWeaponSwitcher(state, equippedSword);
@@ -93,7 +95,10 @@ export function renderHud(state) {
       <div class="hud-section">
         <span class="hud-label">Health Bar</span>
         <div class="hud-health-bar" aria-label="Player health">
-          <div class="hud-health-fill" style="width: ${healthPercent}%"></div>
+          <div
+            class="hud-health-fill"
+            style="width: ${healthPercent}%; --health-color: hsl(${healthHue} 84% 46%)"
+          ></div>
         </div>
         <div class="hud-health-text">${state.player.health} / ${state.player.maxHealth}</div>
       </div>

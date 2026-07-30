@@ -167,14 +167,6 @@ renderer.setAnimationLoop((time) => {
   if (state.mode === 'playing') {
     updatePlayer(delta, input, state);
   } else if (state.mode === 'customize' && !state.ui.tutorial.open) {
-    if (input.isDown('KeyJ')) {
-      state.player.rotationY += state.player.turnSpeed * delta;
-    }
-
-    if (input.isDown('KeyL')) {
-      state.player.rotationY -= state.player.turnSpeed * delta;
-    }
-
     if (input.isDown('ArrowUp')) {
       state.player.rotationX += state.player.turnSpeed * delta;
     }
@@ -235,7 +227,10 @@ renderer.setAnimationLoop((time) => {
   syncSwordLevel(state);
   updateEnemyVisuals(state, camera, delta, elapsedTime);
 
-  if (allEnemiesDefeated(state)) {
+  if (state.mode === 'playing'
+    && state.waveClearPending
+    && allEnemiesDefeated(state)) {
+    state.waveClearPending = false;
     submitWaveScore(state);
     spawnWave(scene, state, state.wave + 1);
   }

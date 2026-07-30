@@ -134,14 +134,14 @@ export function createPlayer(state) {
   rightBracer.position.set(0.54, 0.72 + longerLegOffset, 0);
   group.add(rightBracer);
 
-  const legGeometry = new THREE.BoxGeometry(0.42, 2.18, 0.48);
+  const legGeometry = new THREE.BoxGeometry(0.42, 1.18, 0.48);
   const bootGeometry = new THREE.BoxGeometry(0.38, 0.24, 0.42);
   const leftLeg = new THREE.Mesh(legGeometry, pantsMaterial);
-  leftLeg.position.set(-0.29, 1.09, 0);
+  leftLeg.position.set(-0.29, 0.51, 0);
   group.add(leftLeg);
 
   const rightLeg = new THREE.Mesh(legGeometry, pantsMaterial);
-  rightLeg.position.set(0.29, 1.09, 0);
+  rightLeg.position.set(0.29, 0.51, 0);
   group.add(rightLeg);
 
   const leftBoot = new THREE.Mesh(bootGeometry, darkMaterial);

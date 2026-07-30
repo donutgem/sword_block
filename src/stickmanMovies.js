@@ -139,19 +139,36 @@ function drawJump(context, frame, groundY, scale) {
 
 function drawJumpTrail(context, frame, xSteps, heights, groundY, scale) {
   const currentStep = Math.floor(frame);
-  const dotCount = Math.min(currentStep + 1, xSteps.length);
+  const pointCount = Math.min(currentStep + 1, xSteps.length);
 
-  context.fillStyle = 'rgba(184, 132, 0, 0.42)';
+  if (pointCount < 2) {
+    return;
+  }
 
-  for (let index = 0; index < dotCount; index += 1) {
-    const trailAge = dotCount - index;
-    const radius = Math.max(1.5, 4 - trailAge * 0.18) * scale;
-    const x = xSteps[index] * scale;
-    const y = groundY - heights[index] * scale - 5 * scale;
+  context.lineCap = 'round';
+  context.lineWidth = 2.5 * scale;
+  for (let index = 1; index < pointCount; index += 1) {
+    const opacity = 0.18 + (index / pointCount) * 0.32;
+    const startX = xSteps[index - 1] * scale;
+    const startY = groundY - heights[index - 1] * scale - 5 * scale;
+    const endX = xSteps[index] * scale;
+    const endY = groundY - heights[index] * scale - 5 * scale;
+    const angle = Math.atan2(endY - startY, endX - startX);
+    const halfDash = 2.5 * scale;
+    const centerX = (startX + endX) / 2;
+    const centerY = (startY + endY) / 2;
 
+    context.strokeStyle = `rgba(184, 132, 0, ${opacity})`;
     context.beginPath();
-    context.arc(x, y, radius, 0, Math.PI * 2);
-    context.fill();
+    context.moveTo(
+      centerX - Math.cos(angle) * halfDash,
+      centerY - Math.sin(angle) * halfDash
+    );
+    context.lineTo(
+      centerX + Math.cos(angle) * halfDash,
+      centerY + Math.sin(angle) * halfDash
+    );
+    context.stroke();
   }
 }
 

@@ -9,8 +9,8 @@ const outfitLookOffset = new THREE.Vector3(0, 1.25, 0);
 
 export function createSceneApp(state) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#54cfff');
-  scene.fog = new THREE.Fog('#54cfff', 28, 60);
+  scene.background = new THREE.Color('#8fc7df');
+  scene.fog = new THREE.Fog('#8fc7df', 30, 62);
 
   const camera = new THREE.PerspectiveCamera(
     60,
@@ -24,7 +24,7 @@ export function createSceneApp(state) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.18;
+  renderer.toneMappingExposure = 1.08;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -60,13 +60,13 @@ export function updateCamera(camera, state) {
 }
 
 function addLights(scene) {
-  const fillLight = new THREE.HemisphereLight('#d8f8ff', '#32616d', 0.92);
+  const fillLight = new THREE.HemisphereLight('#dcefff', '#5d4d3d', 0.78);
   scene.add(fillLight);
 
-  const directionalLight = new THREE.DirectionalLight('#fff1ba', 2.25);
-  directionalLight.position.set(8, 14, 7);
+  const directionalLight = new THREE.DirectionalLight('#fff2d6', 2.45);
+  directionalLight.position.set(9, 15, 6);
   directionalLight.castShadow = true;
-  directionalLight.shadow.mapSize.set(1024, 1024);
+  directionalLight.shadow.mapSize.set(2048, 2048);
   directionalLight.shadow.camera.near = 1;
   directionalLight.shadow.camera.far = 42;
   directionalLight.shadow.camera.left = -22;
@@ -74,24 +74,31 @@ function addLights(scene) {
   directionalLight.shadow.camera.top = 22;
   directionalLight.shadow.camera.bottom = -22;
   directionalLight.shadow.bias = -0.001;
+  directionalLight.shadow.normalBias = 0.025;
   scene.add(directionalLight);
 }
 
 function addArena(scene, state) {
+  const groundTexture = createGroundTexture();
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(42, 42),
-    new THREE.MeshStandardMaterial({ color: '#35c85f' })
+    new THREE.MeshStandardMaterial({
+      color: '#79a95d',
+      map: groundTexture,
+      roughness: 0.96,
+      metalness: 0
+    })
   );
   ground.rotation.x = -Math.PI / 2;
   ground.rotation.z = Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);
 
-  const axes = new THREE.AxesHelper(2.4);
-  axes.position.set(0, 0.04, 0);
-  scene.add(axes);
-
-  const wallMaterial = new THREE.MeshStandardMaterial({ color: '#b96b3c' });
+  const wallMaterial = new THREE.MeshStandardMaterial({
+    color: '#9d6747',
+    roughness: 0.88,
+    metalness: 0
+  });
   const northWall = new THREE.Mesh(
     new THREE.BoxGeometry(42, 1.5, 1),
     wallMaterial
@@ -117,6 +124,33 @@ function addArena(scene, state) {
   const westWall = eastWall.clone();
   westWall.position.x = -state.arena.halfSize - 0.5;
   scene.add(westWall);
+}
+
+function createGroundTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+
+  const context = canvas.getContext('2d');
+  context.fillStyle = '#719d56';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  const grassColors = ['#557c42', '#88ad68', '#668d4c'];
+  for (let index = 0; index < 520; index += 1) {
+    const x = (index * 47) % canvas.width;
+    const y = (index * 83 + index * index * 7) % canvas.height;
+    context.fillStyle = grassColors[index % grassColors.length];
+    context.globalAlpha = 0.2 + (index % 4) * 0.08;
+    context.fillRect(x, y, 1, 1 + (index % 3));
+  }
+  context.globalAlpha = 1;
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(12, 12);
+  return texture;
 }
 
 function addForge(scene, state) {

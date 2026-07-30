@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 const textureWidth = 512;
 const textureHeight = 128;
-const lineStart = 36;
+const lineStart = 96;
 const lineEnd = textureWidth - lineStart;
 const lineY = textureHeight / 2;
 
@@ -63,26 +63,23 @@ function drawEnemyHealth(display, health, maxHealth) {
     : 0;
 
   context.clearRect(0, 0, textureWidth, textureHeight);
-  drawNeonHealth(context, healthRatio);
+  drawSolidHealth(context, healthRatio);
   drawHealthNumber(context, health, healthRatio);
 
   display.displayedHealth = health;
   display.texture.needsUpdate = true;
 }
 
-function drawNeonHealth(context, healthRatio) {
+function drawSolidHealth(context, healthRatio) {
   if (healthRatio <= 0) {
     return;
   }
 
   const fillEnd = THREE.MathUtils.lerp(lineStart, lineEnd, healthRatio);
   context.lineCap = 'round';
-  context.lineWidth = 30;
-  context.strokeStyle = '#25ff79';
-  context.shadowColor = '#00ff66';
-  context.shadowBlur = 18;
+  context.lineWidth = 50;
+  context.strokeStyle = '#21d96b';
   drawLine(context, lineStart, fillEnd);
-  context.shadowBlur = 0;
 }
 
 function drawLine(context, startX, endX) {

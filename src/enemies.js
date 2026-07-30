@@ -17,6 +17,8 @@ const blockSize = 3;
 const blockHalfSize = blockSize / 2;
 
 export function spawnWave(scene, state, waveNumber) {
+  state.waveClearPending = false;
+
   for (const enemy of state.enemies) {
     scene.remove(enemy.mesh);
   }
