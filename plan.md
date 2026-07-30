@@ -6,7 +6,7 @@ Make shard crafting faster and easier so players are encouraged to use the forge
 
 ## Status
 
-Ready to build
+Built and verified
 
 ## Questions
 
@@ -49,14 +49,15 @@ Ready to build
 
 ## Build Plan
 
-1. Add direct B/G/P shard placement to the real forge.
-2. Keep WASD cursor movement and existing board rules.
-3. Update forge HUD instructions.
-4. Update the tutorial's forge activity and controls.
-5. Verify direct placement, cursor movement, undo, and confirmation.
-6. Run the production build and a focused visual check.
+1. Completed: Add direct B/G/P shard placement to the real forge.
+2. Completed: Keep WASD cursor movement and existing board rules.
+3. Completed: Update forge HUD instructions.
+4. Completed: Update the tutorial's forge activity and controls.
+5. Completed: Verify direct placement, cursor movement, undo, and confirmation.
+6. Completed: Run the production build and a focused visual check.
 
 ## Previous Completed Work
 
+- Made shard crafting faster with direct B/G/P placement while preserving WASD layout control.
 - Built a six-step bright tutorial with one activity per screen.
 - Added custom shard layouts, advanced level 15 recipes, weapon switching, and merging.

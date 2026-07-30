@@ -83,9 +83,9 @@ function createEnemy(state, maxHealth, damage, x, z, waveNumber) {
   const eye = new THREE.Mesh(
     new THREE.BoxGeometry(1.35, 0.3, 0.18),
     new THREE.MeshStandardMaterial({
-      color: '#07243d',
-      emissive: '#00d9ff',
-      emissiveIntensity: 0.35
+      color: '#000000',
+      emissive: '#000000',
+      emissiveIntensity: 0
     })
   );
   eye.position.set(0, 0.38, blockHalfSize + 0.09);
