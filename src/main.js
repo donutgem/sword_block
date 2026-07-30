@@ -167,14 +167,6 @@ renderer.setAnimationLoop((time) => {
   if (state.mode === 'playing') {
     updatePlayer(delta, input, state);
   } else if (state.mode === 'customize' && !state.ui.tutorial.open) {
-    if (input.isDown('KeyJ')) {
-      state.player.rotationY += state.player.turnSpeed * delta;
-    }
-
-    if (input.isDown('KeyL')) {
-      state.player.rotationY -= state.player.turnSpeed * delta;
-    }
-
     if (input.isDown('ArrowUp')) {
       state.player.rotationX += state.player.turnSpeed * delta;
     }

@@ -85,8 +85,8 @@ canvas {
 .hud-health-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #ff376f 0%, #ffca28 45%, #29e67d 100%);
-  transition: width 120ms ease-out;
+  background-color: var(--health-color, #29e67d);
+  transition: width 120ms ease-out, background-color 180ms ease-out;
 }
 
 .hud-health-text {
@@ -238,7 +238,6 @@ canvas {
   padding: 6px 9px;
   font-size: 0.78rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #27b7f5 0%, #7be8ff 100%);
 }
 
 .hud-option-button {
@@ -267,7 +266,6 @@ canvas {
   margin-top: 10px;
   padding: 10px 12px;
   font-weight: 700;
-  background: linear-gradient(135deg, #20aef2 0%, #68e4ff 100%);
 }
 
 .stickman-showcase {
@@ -824,6 +822,12 @@ canvas {
   min-height: 100%;
   padding: 10px 8px;
   font-weight: 700;
+}
+
+.hud-action-button,
+.hud-small-button,
+.hud-start-button:not(.hud-tutorial-button),
+.music-circle-button {
   border-color: rgba(65, 78, 255, 0.42);
   background: linear-gradient(135deg, #13c7ff 0%, #4164ff 52%, #a74cff 100%);
   box-shadow: 0 8px 20px rgba(65, 100, 255, 0.28);
@@ -846,9 +850,6 @@ canvas {
   height: 42px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 50%;
-  background: linear-gradient(135deg, #1f8ee8 0%, #65c6ff 100%);
-  box-shadow: 0 10px 22px rgba(21, 72, 110, 0.28);
-  color: #ffffff;
   cursor: pointer;
   font: inherit;
   font-size: 0.9rem;
@@ -859,8 +860,8 @@ canvas {
 .music-circle-button:focus-visible {
   outline: none;
   box-shadow:
-    0 10px 22px rgba(21, 72, 110, 0.28),
-    0 0 0 3px rgba(101, 198, 255, 0.42);
+    0 8px 20px rgba(65, 100, 255, 0.28),
+    0 0 0 3px rgba(116, 92, 255, 0.34);
 }
 
 .music-circle-button.is-muted {
