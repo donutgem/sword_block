@@ -262,6 +262,9 @@ function finishHits(state, scene, hitResult) {
     }
 
     state.enemies = remainingEnemies;
+    if (remainingEnemies.length === 0) {
+      state.waveClearPending = true;
+    }
     return true;
   }
 

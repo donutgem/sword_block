@@ -10,6 +10,7 @@ export function createGameState() {
   return {
     mode: 'customize',
     wave: 1,
+    waveClearPending: false,
     score: {
       blocksDefeated: 0
     },

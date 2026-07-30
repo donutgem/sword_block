@@ -227,7 +227,10 @@ renderer.setAnimationLoop((time) => {
   syncSwordLevel(state);
   updateEnemyVisuals(state, camera, delta, elapsedTime);
 
-  if (allEnemiesDefeated(state)) {
+  if (state.mode === 'playing'
+    && state.waveClearPending
+    && allEnemiesDefeated(state)) {
+    state.waveClearPending = false;
     submitWaveScore(state);
     spawnWave(scene, state, state.wave + 1);
   }
