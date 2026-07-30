@@ -108,7 +108,10 @@ export function renderStickmanAnimations(state) {
 export function renderStickmanRemote(state) {
   return `
     <aside class="stickman-remote" aria-label="Stickman animation remote">
-      <div class="stickman-remote-header">Animation Remote</div>
+      <div class="stickman-remote-header">
+        <span>Animation Remote</span>
+        <span class="stickman-remote-dots" aria-hidden="true">•••</span>
+      </div>
       <div class="stickman-showcase">
         ${stickmanStories.map((story) => renderStickmanCard(story, state)).join('')}
       </div>

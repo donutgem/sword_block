@@ -1,4 +1,5 @@
 import { getSelectedHair, hairOptions } from './hair.js';
+import { enableStickmanRemoteDrag } from './draggableRemote.js';
 import { getSelectedPants, getSelectedTop, pantsOptions, topOptions } from './outfit.js';
 import {
   getForgePrompt,
@@ -166,6 +167,7 @@ function getStickmanRemoteRoot() {
     document.body.append(root);
   }
 
+  enableStickmanRemoteDrag(root);
   return root;
 }
 

@@ -2,62 +2,68 @@
 
 ## Goal
 
-Add a Tutorial button to the opening outfit screen. The tutorial should teach a new player everything needed to play through a cute, toned-down simulator without revealing or hinting at the secret code.
+Redesign the existing game tutorial into an original Duolingo-inspired learning experience: short, playful, interactive lessons that teach the same game controls and systems without copying Duolingo characters, logos, or exact artwork.
 
 ## Status
 
-Built
+Ready to build
 
 ## Questions
 
-1. How should the tutorial be shown? Answered.
-2. How much should the player practice? Answered with a simulator idea.
-3. When should the small simulator appear? Answered.
+1. Should the first version use one activity at a time, a lesson path, or both? Answered.
 
 ## Answers
 
-1. Use a guided practice lesson.
-2. Add a cute, toned-down simulator every few minutes.
-3. Keep the simulator inside the tutorial. Show a short practice simulator after each major lesson so the player can hone that ability.
+1. Use one activity at a time.
+2. Replace the tutorial's brown and muted colors with a bright, appealing palette.
 
 ## Reference Notes
 
-- The opening screen is the outfit picker and already has a Start Game button.
-- The game includes turning, forward movement, normal and spin attacks, health, enemies, waves, shard pickups, forge crafting, sword merging, weapon switching, and a leaderboard.
-- The tutorial button must not start the game or start music.
-- The tutorial must not mention, hint at, or expose the secret code.
+- Duolingo describes its lessons as quick, bite-sized, interactive, and game-like.
+- Its course path uses small lesson nodes, clear progress, and increasingly challenging practice.
+- Immediate feedback, points, level unlocking, and completion celebrations make progress easy to understand.
+- Official references:
+  - https://www.duolingo.com/learn
+  - https://blog.duolingo.com/duolingo-teaching-method/
+  - https://blog.duolingo.com/intermediate-mini-units/
+- The current game tutorial has six steps covering movement, combat, health and waves, forging, level 15 weapons, merging, weapon switching, and leaderboard scoring.
+- The redesign must continue hiding the secret code.
 
 ## Risky For First Version
 
-- A fully interactive guided lesson would change gameplay state and require more testing.
-- One very long tutorial page could overwhelm a new player.
-- Reopening a simulator during normal gameplay could interrupt combat and needs careful pausing and state cleanup.
+- A full winding course map plus a new activity system is a larger redesign and will need more visual and navigation testing.
+- Hearts, XP, streaks, shops, and saved lesson progress add several new state systems; they are better added after the core lesson flow works.
+- Adaptive difficulty would be harder to test and is not required to make the tutorial feel playful and bite-sized.
+- Exact Duolingo branding, mascot art, sounds, and screen copies should not be used.
 
 ## Question Notes
 
-- The display format decides whether this is a simple readable overlay or a larger guided system. Several short pages are easier to learn from without changing gameplay.
-- A full hands-on forge and merge lesson needs temporary tutorial items and more state cleanup. Limiting hands-on practice to movement and combat is safer, but leaves more reading.
-- The phrase "every few minutes" needs clarification because it could mean sections inside the tutorial or interruptions during the normal game.
+- The biggest first decision is whether “like Duolingo” means the in-lesson activity flow, the winding lesson path, or both. This changes the whole tutorial layout and amount of work.
+- One activity at a time is fastest to build and easiest to test.
+- A path plus activities gives the fullest version but requires more screens and may need more fixes.
 
 ## Decisions
 
-- Put the Tutorial button on the opening outfit screen.
-- Open a guided practice lesson from the Tutorial button.
-- Make the practice simulator cute and visually calmer than the normal arena.
-- Follow every major lesson with its own short practice step.
-- Keep all tutorial state separate from the real game so tutorial actions do not change scores, items, health, or progress.
-- Keep the tutorial silent.
-- Do not include any information about the secret code.
+- Keep the tutorial separate from real game health, inventory, score, and progress.
+- Keep all existing tutorial topics.
+- Use an original game-themed visual identity inspired by playful bite-sized learning, not copied Duolingo branding.
+- Keep the tutorial silent unless the user later asks for sounds.
+- Show one focused activity per screen instead of a course map.
+- Use immediate success feedback and a simple progress bar.
+- Use bright greens, blues, purples, yellows, and white surfaces instead of brown or beige.
 
 ## Build Plan
 
-1. Completed: Added a Tutorial button beside Start Game on the opening outfit screen.
-2. Completed: Built a self-contained tutorial overlay with lesson and practice steps.
-3. Completed: Taught movement, combat, waves and health, shards and forging, weapon merging, weapon switching, spin cooldowns, and leaderboard scoring.
-4. Completed: Added small practice simulators after movement, combat, forging, and merging lessons.
-5. Completed: Kept the tutorial silent, optional, and separate from real game state.
-6. Completed: Verified the full practice flow, state isolation, and production build.
+1. Restyle the tutorial as a bright, original game-learning lesson.
+2. Keep one focused prompt and practice activity on each screen.
+3. Add clear activity numbering, progress, and success feedback.
+4. Preserve the six-step lesson content and completion rules.
+5. Verify movement, combat, forging, advanced weapons, merging, and finish screens.
+6. Run a production build and focused visual checks.
 
 ## Previous Completed Work
 
-- Added temporary merge advice and a 10% merge power bonus.
+- Added a Tutorial button to the outfit screen.
+- Built six guided lesson and practice steps.
+- Removed Skip Practice so each practice must be completed.
+- Fixed the two-spin combat completion path.

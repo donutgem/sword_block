@@ -211,9 +211,6 @@ function renderNavigation(state, step) {
     <footer class="tutorial-navigation">
       <button type="button" data-tutorial-action="back" ${index === 0 ? 'disabled' : ''}>Back</button>
       <div>
-        ${step.kind === 'practice' && !practiceComplete
-          ? '<button class="tutorial-skip" type="button" data-tutorial-action="skip">Skip practice</button>'
-          : ''}
         <button
           class="tutorial-primary"
           type="button"

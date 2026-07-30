@@ -117,12 +117,6 @@
   background: linear-gradient(135deg, #67bdb1, #9ad8c7);
 }
 
-.tutorial-modal .tutorial-skip {
-  border-color: transparent;
-  background: transparent;
-  color: #647a83;
-}
-
 .hud-start-actions {
   display: grid;
   grid-template-columns: auto 1fr;

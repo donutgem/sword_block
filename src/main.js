@@ -136,10 +136,7 @@ document.addEventListener('pointerdown', (event) => {
   }
 
   if (button.dataset.action === 'spin-attack' && state.mode === 'playing') {
-    if (!performSpinAttack(state, scene) && state.timers.spinCooldown > 0) {
-      setMessage(state, `Spin attack is recharging for ${state.timers.spinCooldown.toFixed(1)} more seconds.`, 2);
-    }
-
+    performSpinAttack(state, scene);
     renderHud(state);
   }
 });

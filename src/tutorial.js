@@ -62,7 +62,7 @@ export function handleTutorialPointer(state, button) {
     state.ui.tutorial = createTutorialState(true);
   } else if (action === 'close' || action === 'finish') {
     state.ui.tutorial.open = false;
-  } else if (action === 'next' || action === 'skip') {
+  } else if (action === 'next') {
     moveTutorialStep(state, 1);
   } else if (action === 'back') {
     moveTutorialStep(state, -1);

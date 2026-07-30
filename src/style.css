@@ -283,8 +283,8 @@ canvas {
 
 .stickman-remote {
   position: fixed;
-  top: 12px;
-  left: min(388px, calc(100vw - 150px));
+  top: var(--stickman-remote-top, 12px);
+  left: var(--stickman-remote-left, min(388px, calc(100vw - 150px)));
   width: 138px;
   max-height: calc(100vh - 24px);
   overflow-y: auto;
@@ -298,6 +298,10 @@ canvas {
 }
 
 .stickman-remote-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   padding: 4px 5px 7px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   color: #b8e5ff;
@@ -306,6 +310,20 @@ canvas {
   letter-spacing: 0.06em;
   text-align: center;
   text-transform: uppercase;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.stickman-remote-dots {
+  color: #7bd4ff;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+#stickman-remote-root.is-dragging .stickman-remote-header {
+  cursor: grabbing;
 }
 
 .stickman-card {
@@ -1246,5 +1264,10 @@ canvas {
     width: 100%;
     max-height: 210px;
     margin-top: 8px;
+  }
+
+  #stickman-remote-root.is-dragged .stickman-remote {
+    position: fixed;
+    margin-top: 0;
   }
 }
