@@ -88,7 +88,9 @@ export function updateProjectiles(state, scene, delta) {
     if (hitResult.hitCount > 0) {
       scene.remove(projectile.mesh);
       finishHits(state, scene, hitResult);
-      setMessage(state, `${projectile.name} hit for ${projectile.damage} damage.`, 2);
+      if (!projectile.silent) {
+        setMessage(state, `${projectile.name} hit for ${projectile.damage} damage.`, 2);
+      }
       continue;
     }
 
@@ -133,13 +135,7 @@ export function performSpinAttack(state, scene) {
     applyDamageToEnemy(enemy, damage, hitResult);
   }
 
-  if (finishHits(state, scene, hitResult)) {
-    setMessage(state, `Spin attack hit ${hitResult.hitCount} block${hitResult.hitCount === 1 ? '' : 's'}.`, 2);
-    return true;
-  }
-
-  setMessage(state, 'Spin attack missed. Let the blocks get closer first.', 2);
-  return false;
+  return finishHits(state, scene, hitResult);
 }
 
 function performNinjaStarSpinAttack(state, scene, weapon) {
@@ -160,11 +156,11 @@ function performNinjaStarSpinAttack(state, scene, weapon) {
       radius: 0.35,
       direction,
       rotationY: angle,
-      damageScale: 0.8
+      damageScale: 0.8,
+      silent: true
     });
   }
 
-  setMessage(state, 'Ninja Star spin flung stars in every direction.', 2);
   return true;
 }
 
@@ -326,7 +322,8 @@ function addWeaponProjectile(state, scene, options) {
     ),
     radius: options.radius,
     life: options.lifetime,
-    name: options.name
+    name: options.name,
+    silent: options.silent ?? false
   });
 }
 

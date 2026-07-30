@@ -2,7 +2,7 @@
 
 ## Goal
 
-Make shard crafting faster and easier so players are encouraged to use the forge more often, while keeping weapon choices understandable and useful.
+Make the game graphics slightly more realistic without losing the clear, simple style or slowing the game down.
 
 ## Status
 
@@ -10,51 +10,43 @@ Built and verified
 
 ## Questions
 
-1. What should remove the most crafting work? Answered.
+1. Which part should look more realistic first? Answered.
 
 ## Answers
 
-1. Press the first letter of a shard to place it immediately: B for blade, G for guard, and P for pommel.
-2. Keep WASD movement on the forge board.
+1. Lighting, shadows, and arena materials.
+2. In the "Jump plan" stickman movie, use short, unconnected lines instead of trail dots.
 
 ## Reference Notes
 
-- The current forge uses a 7-by-5 board.
-- Players choose blade, guard, or pommel with 1/2/3, move a cursor with WASD, place each shard with Enter, then press C.
-- Before level 15, every weapon needs all three shard types.
-- Layout position affects weapon reach, size, angle, and damage.
-- The board remains open until the player closes the forge with E or Escape.
+- The game uses Three.js and grouped primitive shapes.
+- It already has soft shadows, filmic tone mapping, fog, and a bright stylized color palette.
+- The arena currently uses flat colors and includes a visible axes helper.
 
 ## Risky For First Version
 
-- Removing the board completely would also remove the layout-based weapon choices.
-- A large catalog of automatic recipes would need extra balancing and UI work.
-- Automatically spending every shard could surprise players and make inventory choices less clear.
+- Rebuilding every character and object at once would take longer and could make gameplay harder to read.
+- Heavy textures or many extra lights could reduce performance.
 
 ## Question Notes
 
-- The main source of tedium could be the number of button presses, moving the cursor, or needing to design a layout.
-- Quick recipe buttons can reduce work while preserving the custom board.
-- Click-to-place cells reduce keyboard steps but still require players to build the whole layout.
-- One-button crafting is fastest for players but removes most layout choice.
+- Lighting, materials, and the arena can create a more realistic look with the smallest safe change.
+- Character and enemy model changes affect silhouettes and may need more playtesting.
 
 ## Decisions
 
-- Keep crafted weapons stronger than the starter weapon.
-- Keep shard spending clear before a weapon is formed.
-- Do not change shard drop rates until the crafting interaction is settled.
-- Keep the custom forge board and layout-based weapon stats.
-- Make B/G/P select and place the matching shard in one press.
-- Keep C to form the weapon and Backspace to undo.
+- Keep the change subtle.
+- Keep geometry-based visuals and good performance.
+- Focus the realism pass on the environment rather than rebuilding characters.
+- Replace the jump trail dots with short, separate line dashes.
 
 ## Build Plan
 
-1. Completed: Add direct B/G/P shard placement to the real forge.
-2. Completed: Keep WASD cursor movement and existing board rules.
-3. Completed: Update forge HUD instructions.
-4. Completed: Update the tutorial's forge activity and controls.
-5. Completed: Verify direct placement, cursor movement, undo, and confirmation.
-6. Completed: Run the production build and a focused visual check.
+1. Completed: Tuned the sky, fog, light balance, and shadow quality.
+2. Completed: Gave the ground subtle grass variation and the arena walls rougher materials.
+3. Completed: Removed the visible development axes from the arena.
+4. Completed: Replaced the "Jump plan" trail dots with short, separate line dashes.
+5. Completed: Ran the production build and visually checked the arena and jump animation.
 
 ## Previous Completed Work
 

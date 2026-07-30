@@ -8,7 +8,7 @@ export function createTutorialState(open = false) {
     stepIndex: 0,
     movement: { angle: 0, x: 0, y: 0, turns: 0, moves: 0 },
     combat: { normalHits: 0, spinHits: 0, spinCooldown: 0, timerSeen: false },
-    forge: { selected: 'blade', cursor: { x: 1, y: 1 }, placed: [], confirmed: false },
+    forge: { selected: 'blade', cursor: { x: 2, y: 0 }, placed: [], confirmed: false },
     advanced: { selected: 'blade', explored: [] },
     merge: { crafted: 0, merged: false, equipped: false }
   };
