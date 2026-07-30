@@ -187,24 +187,20 @@ function applyCombatInput(practice, code) {
 }
 
 function applyForgeInput(practice, code) {
-  const types = { Digit1: 'blade', Digit2: 'guard', Digit3: 'pommel' };
+  const types = { KeyB: 'blade', KeyG: 'guard', KeyP: 'pommel' };
 
   if (types[code]) {
     practice.selected = types[code];
-    return true;
-  }
-
-  if (moveForgeCursor(practice.cursor, code)) {
-    return true;
-  }
-
-  if (code === 'Enter' || code === 'Space') {
     const occupied = practice.placed.some(
       (part) => part.x === practice.cursor.x && part.y === practice.cursor.y
     );
     if (!occupied) {
       practice.placed.push({ ...practice.cursor, type: practice.selected });
     }
+    return true;
+  }
+
+  if (moveForgeCursor(practice.cursor, code)) {
     return true;
   }
 

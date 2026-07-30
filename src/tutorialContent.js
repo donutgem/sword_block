@@ -28,7 +28,7 @@ export const tutorialSteps = [
     text: 'Defeated blocks raise your level and drop blade, guard, or pommel shards.',
     points: [
       'Walk over shards to collect them. In the glowing forge ring, press E.',
-      'Choose with 1/2/3, move with WASD, place with Enter, undo with Backspace, and forge with C.',
+      'Move with WASD. B places blade, G places guard, P places pommel, Backspace undoes, and C forges.',
       'E or Escape closes the forge.',
       'Before level 15, a weapon needs all three shard types. Smaller mixes unlock at level 15.'
     ]

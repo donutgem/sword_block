@@ -1,41 +1,30 @@
 .tutorial-simulator {
   padding: 14px;
-  border: 2px solid #dce8dd;
+  border: 2px solid #b9e6ff;
   border-radius: 18px;
-  background: linear-gradient(145deg, #f7f2df, #e9f4ea);
-  box-shadow: inset 0 0 28px rgba(109, 158, 139, 0.08);
-}
-
-.tutorial-status {
-  margin-top: 10px;
-  background: #f6ead3;
-  color: #75551c;
-}
-
-.tutorial-status.is-complete {
-  background: #dff4e6;
-  color: #27603c;
+  background: linear-gradient(145deg, #f2fbff, #f5f1ff);
+  box-shadow: inset 0 0 30px rgba(72, 163, 255, 0.08);
 }
 
 .tutorial-mini-arena,
 .tutorial-combat-scene {
   position: relative;
-  height: 150px;
+  height: 130px;
   margin: 12px 0;
   overflow: hidden;
-  border: 1px solid #bdd5c5;
+  border: 2px solid #b7e7ff;
   border-radius: 16px;
 }
 
 .tutorial-mini-arena {
-  background: linear-gradient(145deg, #eaf8e2, #dff3ee);
+  background: linear-gradient(145deg, #dffbff, #e8f7ff 50%, #ecf7e0);
 }
 
 .tutorial-combat-scene {
   background:
-    linear-gradient(rgba(129, 174, 148, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(129, 174, 148, 0.12) 1px, transparent 1px),
-    #eef5df;
+    linear-gradient(rgba(62, 189, 238, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62, 189, 238, 0.12) 1px, transparent 1px),
+    #e9faff;
   background-size: 24px 24px;
 }
 
@@ -82,8 +71,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #e3a5ad;
-  box-shadow: 7px 0 #e3a5ad, 3px -5px #e3a5ad, 3px 5px #e3a5ad;
+  background: #ff72b6;
+  box-shadow: 7px 0 #ff72b6, 3px -5px #ff72b6, 3px 5px #ff72b6;
 }
 
 .flower-one { top: 28px; left: 30px; }
@@ -111,19 +100,20 @@
 .tutorial-shard-picks kbd {
   padding: 2px 5px;
   border-radius: 5px;
-  background: #e7f1ed;
-  box-shadow: inset 0 -1px 0 rgba(29, 68, 69, 0.18);
-  color: #234d4a;
+  background: #e7f8ff;
+  box-shadow: inset 0 -2px 0 rgba(41, 124, 175, 0.16);
+  color: #14577d;
   font: inherit;
   font-weight: 900;
 }
 
 .tutorial-modal button {
   padding: 8px 11px;
-  border: 1px solid rgba(38, 69, 82, 0.18);
+  border: 2px solid #cfe6f5;
   border-radius: 10px;
   background: #ffffff;
-  color: #213d4b;
+  box-shadow: 0 3px 0 #c5dbe9;
+  color: #173f5e;
   cursor: pointer;
   font: inherit;
   font-weight: 700;
@@ -131,14 +121,14 @@
 
 .tutorial-modal button:hover:not(:disabled),
 .tutorial-modal button:focus-visible {
-  border-color: #4a9d91;
-  outline: 2px solid rgba(74, 157, 145, 0.22);
+  border-color: #6c7cff;
+  outline: 3px solid rgba(108, 124, 255, 0.18);
 }
 
 .tutorial-controls button[data-tutorial-key="Spin"] {
-  border-color: #ff4f8d;
+  border-color: #ff3f81;
   background: linear-gradient(135deg, #ff3f81, #ff8a35);
-  box-shadow: 0 7px 18px rgba(255, 63, 129, 0.24);
+  box-shadow: 0 4px 0 #cf2d67, 0 8px 18px rgba(255, 63, 129, 0.24);
   color: #ffffff;
 }
 
@@ -159,8 +149,8 @@
   width: 76px;
   height: 76px;
   border-radius: 16px;
-  background: #64b9ae;
-  box-shadow: 0 8px 0 #3b8d86;
+  background: linear-gradient(145deg, #24d8d0, #20aee8);
+  box-shadow: 0 8px 0 #1685b2;
   transition: transform 160ms ease, opacity 160ms ease;
 }
 
@@ -176,8 +166,8 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #173d44;
-  box-shadow: 27px 0 #173d44;
+  background: #153b66;
+  box-shadow: 27px 0 #153b66;
 }
 
 .tutorial-practice-block.is-defeated {
@@ -189,7 +179,7 @@
   position: absolute;
   width: 118px;
   height: 118px;
-  border: 5px solid rgba(217, 166, 65, 0.62);
+  border: 5px solid rgba(255, 70, 159, 0.72);
   border-radius: 50%;
   content: '';
   animation: tutorialSpin 650ms ease-out both;
@@ -208,15 +198,15 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  border: 1px solid #b9cfc4;
+  border: 2px solid #c6e8f8;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.78);
   font-weight: 800;
 }
 
 .tutorial-forge-cell.is-cursor {
-  border-color: #d39a35;
-  box-shadow: 0 0 0 3px rgba(211, 154, 53, 0.22);
+  border-color: #745cff;
+  box-shadow: 0 0 0 3px rgba(116, 92, 255, 0.22);
 }
 
 .tutorial-weapon-rack {
@@ -231,7 +221,7 @@
   display: grid;
   justify-items: center;
   gap: 10px;
-  color: #52656d;
+  color: #4c6282;
   font-size: 0.78rem;
 }
 
@@ -241,14 +231,14 @@
   height: 70px;
   border-radius: 7px 7px 3px 3px;
   background: linear-gradient(90deg, #b8cad1, #ffffff, #94adb7);
-  box-shadow: 0 8px 0 5px #d6a846;
+  box-shadow: 0 8px 0 5px #ffd735;
   transform: rotate(20deg);
 }
 
 .tutorial-weapon-rack.is-merged .tutorial-mini-sword i {
   width: 14px;
   height: 82px;
-  background: linear-gradient(90deg, #d5be63, #fff8bf, #b9942f);
+  background: linear-gradient(90deg, #6bd7ff, #ffffff, #8d72ff);
 }
 
 @keyframes tutorialSpin {

@@ -4,7 +4,8 @@
   margin: 10px 0;
   padding: 9px 10px;
   border-radius: 11px;
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #cdeaff;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .tutorial-cooldown > div:first-child {
@@ -14,25 +15,25 @@
 }
 
 .tutorial-cooldown strong {
-  color: #286b65;
+  color: #664cff;
 }
 
 .tutorial-cooldown-track {
   height: 9px;
   overflow: hidden;
   border-radius: 999px;
-  background: #d8e2df;
+  background: #e2eaf5;
 }
 
 .tutorial-cooldown-track i {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #d79d38, #f1c66b);
+  background: linear-gradient(90deg, #8d5cff, #ff4fa1);
   transition: width 100ms linear;
 }
 
 .tutorial-cooldown small {
-  color: #566d76;
+  color: #4f6680;
   line-height: 1.35;
 }

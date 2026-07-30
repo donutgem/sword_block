@@ -77,7 +77,7 @@ export function openForge(state) {
   state.ui.forgeOpen = true;
   const message = canMergeNewestSwords(state)
     ? 'You have two weapons ready. Press M to merge them for extra power.'
-    : 'Forge opened. Arrange shards and press C to make a weapon.';
+    : 'Forge opened. Move with WASD, place shards with B/G/P, and press C.';
   setMessage(state, message, 4);
 }
 
@@ -90,6 +90,10 @@ export function handleForgeInput(state, input) {
   if (input.consumePress('Escape') || input.consumePress('KeyE')) {
     closeForge(state);
     setMessage(state, 'Forge closed.', 2);
+    return;
+  }
+
+  if (placeShardFromShortcut(state, input)) {
     return;
   }
 
@@ -146,6 +150,24 @@ export function handleForgeInput(state, input) {
   if (input.consumePress('KeyM')) {
     mergeNewestSwords(state);
   }
+}
+
+function placeShardFromShortcut(state, input) {
+  const shortcuts = [
+    ['KeyB', 'blade'],
+    ['KeyG', 'guard'],
+    ['KeyP', 'pommel']
+  ];
+
+  for (const [key, type] of shortcuts) {
+    if (input.consumePress(key)) {
+      selectShardType(state, type);
+      placeSelectedShard(state);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function collectShard(state, shardType) {

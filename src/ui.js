@@ -69,10 +69,10 @@ export function renderHud(state) {
       ? `
         <div class="hud-panel">
           <h2 class="hud-title">Forge</h2>
-          <p class="hud-help">1 blade, 2 guard, 3 pommel</p>
+          <p class="hud-help"><strong>B</strong> blade · <strong>G</strong> guard · <strong>P</strong> pommel</p>
           <p class="hud-help">Before level 15, use blade, guard, and pommel together.</p>
           <p class="hud-help">Level 15 unlocks one-type and two-type shard weapons.</p>
-          <p class="hud-help">Move cursor with WASD. Enter places a shard.</p>
+          <p class="hud-help">Move with WASD, then press a shard letter to place it.</p>
           <div class="craft-board">${renderCraftBoard(state)}</div>
           <p class="hud-help">Selected: ${state.forge.board.selectedType}</p>
           <p class="hud-help">
@@ -80,7 +80,7 @@ export function renderHud(state) {
             guard ${getAvailableShardCount(state, 'guard')},
             pommel ${getAvailableShardCount(state, 'pommel')}
           </p>
-          <p class="hud-help">C confirms the layout. Backspace removes the last shard.</p>
+          <p class="hud-help">C forms the weapon. Backspace removes the last shard.</p>
           <p class="hud-help">${forgeState.craftStatusText}</p>
           <p class="hud-help">M merges the two newest crafted weapons.</p>
           <p class="hud-help">E or Esc: Close forge</p>

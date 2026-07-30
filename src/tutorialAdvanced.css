@@ -15,13 +15,13 @@
   min-height: 155px;
   margin-bottom: 10px;
   padding: 15px;
-  border: 1px solid #c6d9cf;
+  border: 2px solid #c8eaff;
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.72);
+  background: linear-gradient(145deg, #ffffff, #f4f0ff);
 }
 
 .tutorial-advanced-card > span {
-  color: #667d87;
+  color: #55718d;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -29,7 +29,7 @@
 }
 
 .tutorial-advanced-card strong {
-  color: #8a6220;
+  color: #704cff;
   font-size: 1.25rem;
 }
 
@@ -40,5 +40,5 @@
 
 .tutorial-advanced-card small {
   align-self: end;
-  color: #526b72;
+  color: #496781;
 }

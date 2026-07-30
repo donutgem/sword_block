@@ -2,7 +2,7 @@
 
 ## Goal
 
-Redesign the existing game tutorial into an original Duolingo-inspired learning experience: short, playful, interactive lessons that teach the same game controls and systems without copying Duolingo characters, logos, or exact artwork.
+Make shard crafting faster and easier so players are encouraged to use the forge more often, while keeping weapon choices understandable and useful.
 
 ## Status
 
@@ -10,60 +10,53 @@ Ready to build
 
 ## Questions
 
-1. Should the first version use one activity at a time, a lesson path, or both? Answered.
+1. What should remove the most crafting work? Answered.
 
 ## Answers
 
-1. Use one activity at a time.
-2. Replace the tutorial's brown and muted colors with a bright, appealing palette.
+1. Press the first letter of a shard to place it immediately: B for blade, G for guard, and P for pommel.
+2. Keep WASD movement on the forge board.
 
 ## Reference Notes
 
-- Duolingo describes its lessons as quick, bite-sized, interactive, and game-like.
-- Its course path uses small lesson nodes, clear progress, and increasingly challenging practice.
-- Immediate feedback, points, level unlocking, and completion celebrations make progress easy to understand.
-- Official references:
-  - https://www.duolingo.com/learn
-  - https://blog.duolingo.com/duolingo-teaching-method/
-  - https://blog.duolingo.com/intermediate-mini-units/
-- The current game tutorial has six steps covering movement, combat, health and waves, forging, level 15 weapons, merging, weapon switching, and leaderboard scoring.
-- The redesign must continue hiding the secret code.
+- The current forge uses a 7-by-5 board.
+- Players choose blade, guard, or pommel with 1/2/3, move a cursor with WASD, place each shard with Enter, then press C.
+- Before level 15, every weapon needs all three shard types.
+- Layout position affects weapon reach, size, angle, and damage.
+- The board remains open until the player closes the forge with E or Escape.
 
 ## Risky For First Version
 
-- A full winding course map plus a new activity system is a larger redesign and will need more visual and navigation testing.
-- Hearts, XP, streaks, shops, and saved lesson progress add several new state systems; they are better added after the core lesson flow works.
-- Adaptive difficulty would be harder to test and is not required to make the tutorial feel playful and bite-sized.
-- Exact Duolingo branding, mascot art, sounds, and screen copies should not be used.
+- Removing the board completely would also remove the layout-based weapon choices.
+- A large catalog of automatic recipes would need extra balancing and UI work.
+- Automatically spending every shard could surprise players and make inventory choices less clear.
 
 ## Question Notes
 
-- The biggest first decision is whether “like Duolingo” means the in-lesson activity flow, the winding lesson path, or both. This changes the whole tutorial layout and amount of work.
-- One activity at a time is fastest to build and easiest to test.
-- A path plus activities gives the fullest version but requires more screens and may need more fixes.
+- The main source of tedium could be the number of button presses, moving the cursor, or needing to design a layout.
+- Quick recipe buttons can reduce work while preserving the custom board.
+- Click-to-place cells reduce keyboard steps but still require players to build the whole layout.
+- One-button crafting is fastest for players but removes most layout choice.
 
 ## Decisions
 
-- Keep the tutorial separate from real game health, inventory, score, and progress.
-- Keep all existing tutorial topics.
-- Use an original game-themed visual identity inspired by playful bite-sized learning, not copied Duolingo branding.
-- Keep the tutorial silent unless the user later asks for sounds.
-- Show one focused activity per screen instead of a course map.
-- Use immediate success feedback and a simple progress bar.
-- Use bright greens, blues, purples, yellows, and white surfaces instead of brown or beige.
+- Keep crafted weapons stronger than the starter weapon.
+- Keep shard spending clear before a weapon is formed.
+- Do not change shard drop rates until the crafting interaction is settled.
+- Keep the custom forge board and layout-based weapon stats.
+- Make B/G/P select and place the matching shard in one press.
+- Keep C to form the weapon and Backspace to undo.
 
 ## Build Plan
 
-1. Restyle the tutorial as a bright, original game-learning lesson.
-2. Keep one focused prompt and practice activity on each screen.
-3. Add clear activity numbering, progress, and success feedback.
-4. Preserve the six-step lesson content and completion rules.
-5. Verify movement, combat, forging, advanced weapons, merging, and finish screens.
-6. Run a production build and focused visual checks.
+1. Add direct B/G/P shard placement to the real forge.
+2. Keep WASD cursor movement and existing board rules.
+3. Update forge HUD instructions.
+4. Update the tutorial's forge activity and controls.
+5. Verify direct placement, cursor movement, undo, and confirmation.
+6. Run the production build and a focused visual check.
 
 ## Previous Completed Work
 
-- Added a Tutorial button to the outfit screen.
-- Built six guided lesson and practice steps.
-- Removed Skip Practice so each practice must be completed.
-- Fixed the two-spin combat completion path.
+- Built a six-step bright tutorial with one activity per screen.
+- Added custom shard layouts, advanced level 15 recipes, weapon switching, and merging.

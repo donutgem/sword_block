@@ -34,15 +34,16 @@ function createTutorialMarkup(state) {
   return `
     <div class="tutorial-backdrop">
       <section class="tutorial-modal" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
-        <header class="tutorial-header">
-          <div>
-            <span class="tutorial-kicker">Step ${index + 1} of ${tutorialSteps.length}</span>
-            <h2 id="tutorial-title">${step.title}</h2>
+        <header class="tutorial-topbar">
+          <button class="tutorial-close" type="button" data-tutorial-action="close" aria-label="Close tutorial">×</button>
+          <div class="tutorial-progress" aria-label="Tutorial progress">
+            <span style="width: ${percent}%"></span>
           </div>
-          <button class="tutorial-close" type="button" data-tutorial-action="close" aria-label="Close tutorial">Close</button>
+          <strong class="tutorial-step-count">${index + 1}/${tutorialSteps.length}</strong>
         </header>
-        <div class="tutorial-progress" aria-hidden="true">
-          <span style="width: ${percent}%"></span>
+        <div class="tutorial-title-block">
+          <span class="tutorial-kicker">Game skill</span>
+          <h2 id="tutorial-title">${step.title}</h2>
         </div>
         <div class="tutorial-content">
           ${step.kind === 'lesson' ? renderLesson(step) : renderPractice(state, step)}
@@ -71,15 +72,11 @@ function renderPractice(state, step) {
     merge: renderMergePractice
   };
   const renderer = practiceRenderers[step.practice];
-  const complete = isTutorialPracticeComplete(state);
 
   return `
     ${renderPracticeSummary(step)}
     <div class="tutorial-simulator">
       ${renderer ? renderer(state.ui.tutorial) : ''}
-    </div>
-    <div class="tutorial-status ${complete ? 'is-complete' : ''}" aria-live="polite">
-      ${complete ? 'Practice complete. Nice work.' : 'Finish the small task to continue.'}
     </div>
   `;
 }
@@ -161,11 +158,11 @@ function renderForgePractice(tutorial) {
   }
 
   return `
-    <p>Place one blade, guard, and pommel. Move between placements, then press C.</p>
+    <p>Move with WASD. Press B, G, or P to place that shard, then press C.</p>
     <div class="tutorial-shard-picks">
-      ${keyButton('Digit1', '1', 'selects a blade shard')}
-      ${keyButton('Digit2', '2', 'selects a guard shard')}
-      ${keyButton('Digit3', '3', 'selects a pommel shard')}
+      ${keyButton('KeyB', 'B', 'places a blade shard')}
+      ${keyButton('KeyG', 'G', 'places a guard shard')}
+      ${keyButton('KeyP', 'P', 'places a pommel shard')}
     </div>
     <div class="tutorial-forge-board">${cells.join('')}</div>
     <div class="tutorial-controls tutorial-controls-wrap">
@@ -173,7 +170,6 @@ function renderForgePractice(tutorial) {
       ${keyButton('KeyA', 'A', 'moves the selected square left')}
       ${keyButton('KeyS', 'S', 'moves the selected square down')}
       ${keyButton('KeyD', 'D', 'moves the selected square right')}
-      ${keyButton('Enter', 'Enter', 'places the selected shard')}
       ${keyButton('Backspace', 'Backspace', 'removes the last shard')}
       ${keyButton('KeyC', 'C', 'forms a weapon from the layout')}
     </div>
@@ -206,11 +202,24 @@ function renderNavigation(state, step) {
   const isLast = index === tutorialSteps.length - 1;
   const practiceComplete = isTutorialPracticeComplete(state);
   const nextDisabled = step.kind === 'practice' && !practiceComplete;
+  const feedbackTitle = practiceComplete
+    ? (isLast ? 'Ready for the arena!' : 'Great job!')
+    : 'Complete this activity';
+  const feedbackText = practiceComplete
+    ? (isLast ? 'You know the essentials.' : 'Continue to unlock the next skill.')
+    : 'Finish the task above to continue.';
 
   return `
-    <footer class="tutorial-navigation">
-      <button type="button" data-tutorial-action="back" ${index === 0 ? 'disabled' : ''}>Back</button>
-      <div>
+    <footer class="tutorial-navigation ${practiceComplete ? 'is-complete' : ''}" aria-live="polite">
+      <div class="tutorial-feedback">
+        <span class="tutorial-feedback-mark">${practiceComplete ? '✓' : '!'}</span>
+        <span>
+          <strong>${feedbackTitle}</strong>
+          <small>${feedbackText}</small>
+        </span>
+      </div>
+      <div class="tutorial-actions">
+        <button type="button" data-tutorial-action="back" ${index === 0 ? 'disabled' : ''}>Back</button>
         <button
           class="tutorial-primary"
           type="button"
